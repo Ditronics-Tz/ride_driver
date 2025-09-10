@@ -6,13 +6,8 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
-      // Remove the black background; gradient will cover everything.
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -24,89 +19,104 @@ class WelcomeScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          // Keep top safe area; bottom can extend if you prefer:
-          // top: true, bottom: false,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Logo & name
-              Positioned(
-                top: size.height * 0.10,
-                left: 0,
-                right: 0,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.directions_car_outlined,
-                      color: Colors.white,
-                      size: 56,
-                    ),
-                    const SizedBox(height: 12),
-                    RichText(
-                      text: TextSpan(
-                        style: GoogleFonts.inter(
-                          fontSize: 40,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.5,
-                          height: 1.05,
-                        ),
-                        children: const [
-                          TextSpan(
-                            text: 'Driver',
-                            style: TextStyle(color: Colors.white),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final h = constraints.maxHeight;
+              final w = constraints.maxWidth;
+
+              // Tunable layout numbers (adjust if needed)
+              final carHeight = h * 0.58;          // overall car display height
+              final carBottomOvershoot = -9.0;     // push car slightly off-screen bottom
+              final buttonLiftFromCarBottom = carHeight * 0.38; // how high button floats over car
+              final buttonWidth = 92.0;
+              final buttonHeight = 52.0;
+
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Logo + name
+                  Positioned(
+                    top: h * 0.10,
+                    left: 0,
+                    right: 0,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.directions_car_outlined,
+                            color: Colors.white, size: 54),
+                        const SizedBox(height: 10),
+                        RichText(
+                          text: TextSpan(
+                            style: GoogleFonts.inter(
+                              fontSize: 38,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.5,
+                              height: 1.0,
+                            ),
+                            children: const [
+                              TextSpan(
+                                text: 'eDri',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              TextSpan(
+                                text: 'ver',
+                                style: TextStyle(color: Color(0xFF6CB4FF)),
+                              ),
+                            ],
                           ),
-                          TextSpan(
-                            text: 'Ride',
-                            style: TextStyle(
-                              color: Color(0xFF6CB4FF),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Car (anchored bottom, slightly larger & overshooting)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: carBottomOvershoot,
+                    child: IgnorePointer(
+                      child: SizedBox(
+                        height: carHeight,
+                        width: w,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          alignment: Alignment.bottomCenter,
+                          child: Image.asset(
+                            'assets/images/md1.png',
+                            height: carHeight,
+                            errorBuilder: (c, e, s) => Container(
+                              width: 220,
+                              height: 300,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Icon(
+                                Icons.directions_car_filled,
+                                size: 80,
+                                color: Colors.white54,
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Car image
-              Positioned(
-                bottom: size.height * 0.18,
-                left: 0,
-                right: 0,
-                child: SizedBox(
-                  height: size.height * 0.42,
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Image.asset(
-                      'assets/images/md.png',
-                      errorBuilder: (context, error, stack) => Container(
-                        width: 220,
-                        height: 300,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Icon(
-                          Icons.directions_car_filled,
-                          size: 80,
-                          color: Colors.white54,
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
 
-              // Start button
-              Positioned(
-                bottom: size.height * 0.06,
-                child: _StartButton(
-                  onTap: () => _handleStartButton(context),
-                ),
-              ),
-            ],
+                  // Button (floats over upper part of the car)
+                  Positioned(
+                    left: (w - buttonWidth) / 2,
+                    bottom: carBottomOvershoot + buttonLiftFromCarBottom,
+                    child: _StartButton(
+                      width: buttonWidth,
+                      height: buttonHeight,
+                      onTap: () => _handleStartButton(context),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -155,7 +165,13 @@ class WelcomeScreen extends StatelessWidget {
 
 class _StartButton extends StatelessWidget {
   final VoidCallback onTap;
-  const _StartButton({required this.onTap});
+  final double width;
+  final double height;
+  const _StartButton({
+    required this.onTap,
+    this.width = 96,
+    this.height = 54,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -163,8 +179,8 @@ class _StartButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        width: 96,
-        height: 54,
+        width: width,
+        height: height,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
@@ -177,9 +193,9 @@ class _StartButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.30),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
+              color: Colors.black.withOpacity(0.35),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
