@@ -28,21 +28,74 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final carHeight = size.height * 0.26;
+
+    // ---------- TUNING ----------
+    final double carHeightFactor = 0.55;   // How tall the car image area is (fraction of screen height)
+    final double carBottomOvershoot = 0.0; // Use negative (e.g. -20) to push image slightly off-screen
+    // ----------------------------
 
     return Scaffold(
       body: Stack(
         children: [
-          // Background gradient
-            Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF2563EB),
-                  Color(0xFF123A91),
-                ],
+          // Gradient base (kept so areas below image stay on-brand)
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF2563EB),
+                    Color(0xFF123A91),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // BOTTOM-ANCHORED car image (was top-anchored before)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: carBottomOvershoot,
+            child: IgnorePointer(
+              child: SizedBox(
+                height: size.height * carHeightFactor,
+                width: size.width,
+                child: Image.asset(
+                  'assets/images/md1.png',
+                  fit: BoxFit.cover,            // Try BoxFit.contain if you want the full car visible
+                  alignment: Alignment.bottomCenter,
+                  errorBuilder: (c, e, s) => Container(
+                    color: const Color(0xFF123A91),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      CupertinoIcons.car_detailed,
+                      size: 120,
+                      color: Colors.white30,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Overlay to keep text readable (fades more towards bottom)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: const [
+                      Color(0xCC1E4FAF), // top tint
+                      Color(0x552563EB), // softer mid
+                      Color(0xEE123A91), // strong bottom for form contrast
+                    ],
+                    stops: const [0.0, 0.42, 1.0],
+                  ),
+                ),
               ),
             ),
           ),
@@ -53,43 +106,26 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: EdgeInsets.only(
                 left: 20,
                 right: 20,
-                top: size.height * 0.055,
+                top: size.height * 0.06,
                 bottom: 40,
               ),
               child: Column(
                 children: [
                   const _BrandHeader(
                     showTagline: false,
-                    titleSize: 36,
-                    iconSize: 58,
-                    circleSize: 70,
+                    titleSize: 38,
+                    iconSize: 60,
+                    circleSize: 72,
                   ),
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 34),
 
-                  // Car image (brand consistency)
-                  SizedBox(
-                    height: carHeight,
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: Image.asset(
-                        'assets/images/md1.png',
-                        height: carHeight,
-                        errorBuilder: (c, e, s) => const Icon(
-                          Icons.directions_car_filled,
-                          size: 110,
-                          color: Colors.white30,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
                   Text(
                     'Welcome back',
                     style: GoogleFonts.inter(
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white.withOpacity(0.95),
+                      color: Colors.white.withOpacity(0.97),
+                      letterSpacing: -0.2,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -99,11 +135,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      color: Colors.white.withOpacity(0.80),
+                      color: Colors.white.withOpacity(0.82),
                       letterSpacing: 0.2,
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 30),
 
                   _LoginForm(
                     formKey: _formKey,
@@ -113,9 +149,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     onToggleObscure: () => setState(() => _obscure = !_obscure),
                   ),
 
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 26),
 
-                  // Gradient-wrapped GetWidget button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -132,16 +167,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.28),
-                            blurRadius: 18,
-                            offset: const Offset(0, 8),
+                            color: Colors.black.withOpacity(0.35),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           )
                         ],
                       ),
                       child: GFButton(
                         onPressed: _loading ? null : _submit,
                         size: GFSize.LARGE,
-                        color: Colors.transparent, // gradient provides color
+                        color: Colors.transparent,
                         elevation: 0,
                         fullWidthButton: true,
                         textStyle: GoogleFonts.inter(
@@ -171,15 +206,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               )
                             : const Text(
                                 'Login',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
+                                style: TextStyle(color: Colors.white),
                               ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
                   GFButton(
                     onPressed: _loading ? null : _forgotPassword,
                     type: GFButtonType.transparent,
@@ -189,15 +222,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Divider(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withOpacity(0.18),
                     thickness: 1,
-                    height: 40,
+                    height: 44,
                   ),
-
-                  // Register prompt
                   Text.rich(
                     TextSpan(
                       style: GoogleFonts.inter(
@@ -222,7 +252,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Back button (Cupertino style)
           Positioned(
             top: MediaQuery.of(context).padding.top + 4,
             left: 4,
@@ -235,12 +264,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Fullscreen loader overlay (optional visual emphasis)
           if (_loading)
             Positioned.fill(
               child: IgnorePointer(
                 child: Container(
-                  color: Colors.black.withOpacity(0.25),
+                  color: Colors.black.withOpacity(0.30),
                   alignment: Alignment.center,
                   child: const GFLoader(
                     type: GFLoaderType.circle,
@@ -332,7 +360,7 @@ class _LoginForm extends StatelessWidget {
             ),
             validator: (v) => emailValidator(v),
           ),
-          const SizedBox(height: 18),
+            const SizedBox(height: 20),
           TextFormField(
             controller: passwordCtrl,
             obscureText: obscure,
@@ -375,35 +403,34 @@ class _LoginForm extends StatelessWidget {
         letterSpacing: 0.2,
       ),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.10),
+      fillColor: Colors.white.withOpacity(0.12),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide(
-          color: Colors.white.withOpacity(0.18),
-          width: 1.2,
+          color: Colors.white.withOpacity(0.16),
+          width: 1.1,
         ),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(
           color: Color(0xFF8CCBFF),
-          width: 1.5,
+          width: 1.4,
         ),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Colors.redAccent, width: 1.2),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.1),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Colors.redAccent, width: 1.3),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.2),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
     );
   }
 }
 
-// Reusable brand header (same style as welcome)
 class _BrandHeader extends StatelessWidget {
   final bool showTagline;
   final double titleSize;
