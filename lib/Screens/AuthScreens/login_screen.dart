@@ -32,14 +32,14 @@ class _LoginScreenState extends State<LoginScreen> {
     // ---------- TUNING ----------
     final double carHeightFactor = 0.55;     // Fraction of screen height used by the car image
     final double carBottomOvershoot = 0.0;   // Negative to push image further down/off-screen
-    final Color  globalOverlayColor  = const Color(0xFF0C3C85);
+    final Color globalOverlayColor = const Color(0xFF0C3C85);
     final double globalOverlayOpacity = 0.55; // 0 = no tint, 1 = solid
     // ----------------------------
 
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient base (kept so areas below image stay on-brand)
+          // Gradient base
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // BOTTOM-ANCHORED car image (clean: no internal overlay now)
+            // Car image bottom-anchored
           Positioned(
             left: 0,
             right: 0,
@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // NEW: full-screen uniform overlay tint (removed previous per-image overlay & fade)
+          // Full-screen uniform tint
           Positioned.fill(
             child: IgnorePointer(
               child: Container(
@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Scrollable content
+          // Content
           SafeArea(
             child: SingleChildScrollView(
               padding: EdgeInsets.only(
@@ -155,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(100), // was 16 -> pill
+                        borderRadius: BorderRadius.circular(100),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.35),
@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.transparent,
                         elevation: 0,
                         fullWidthButton: true,
-                        shape: GFButtonShape.pills, // ensure internal hitbox is pill
+                        shape: GFButtonShape.pills,
                         textStyle: GoogleFonts.inter(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
@@ -214,12 +214,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Divider(
-                    color: Colors.white.withOpacity(0.18),
-                    thickness: 1,
-                    height: 44,
-                  ),
+                  const SizedBox(height: 4),
+
+                  const _SocialLoginRow(),
+
                   Text.rich(
                     TextSpan(
                       style: GoogleFonts.inter(
@@ -296,6 +294,34 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+  void _handleGoogle() {
+    if (_loading) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Google login coming soon',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: const Color(0xFF123A91),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _handleApple() {
+    if (_loading) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Apple login coming soon',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: const Color(0xFF123A91),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 }
 
 class _LoginForm extends StatelessWidget {
@@ -314,7 +340,8 @@ class _LoginForm extends StatelessWidget {
   });
 
   bool _isValidEmail(String v) {
-    final emailRegex = RegExp(r'^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$');
+    final emailRegex =
+        RegExp(r'^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$');
     return emailRegex.hasMatch(v);
   }
 
@@ -326,7 +353,6 @@ class _LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Big radius so the field looks like a pill
     const double pillRadius = 40;
 
     String? phoneOrEmailValidator(String? v) {
@@ -336,9 +362,8 @@ class _LoginForm extends StatelessWidget {
       return 'Enter valid email or phone';
     }
 
-    final passwordValidator = ValidationBuilder()
-        .minLength(6, 'Min 6 chars')
-        .build();
+    final passwordValidator =
+        ValidationBuilder().minLength(6, 'Min 6 chars').build();
 
     return Form(
       key: formKey,
@@ -354,7 +379,7 @@ class _LoginForm extends StatelessWidget {
             cursorColor: const Color(0xFF8CCBFF),
             decoration: _decoration(
               label: 'Phone number or Email',
-              icon: CupertinoIcons.person, // changed icon to a neutral one
+              icon: CupertinoIcons.person,
               pillRadius: pillRadius,
             ),
             validator: phoneOrEmailValidator,
@@ -482,7 +507,7 @@ class _BrandHeader extends StatelessWidget {
         const SizedBox(height: 16),
         _GradientText(
           'RideApp',
-          style: titleStyle,
+            style: titleStyle,
           gradient: const LinearGradient(
             colors: [Colors.white, Color(0xFF8CCBFF)],
             begin: Alignment.topLeft,
@@ -523,6 +548,158 @@ class _GradientText extends StatelessWidget {
       blendMode: BlendMode.srcIn,
       shaderCallback: (rect) => gradient.createShader(rect),
       child: Text(text, style: style),
+    );
+  }
+}
+
+class _SocialLoginRow extends StatelessWidget {
+  const _SocialLoginRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 0, bottom: 6),
+      child: SizedBox(
+        height: 56,
+        child: Row(
+          children: const [
+            Expanded(
+              child: _SocialButton(
+                type: _SocialType.google,
+                label: 'Google',
+              ),
+            ),
+            SizedBox(width: 14),
+            Expanded(
+              child: _SocialButton(
+                type: _SocialType.apple,
+                label: 'Apple',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum _SocialType { google, apple }
+
+class _SocialButton extends StatelessWidget {
+  final _SocialType type;
+  final String label;
+  const _SocialButton({
+    required this.type,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.findAncestorStateOfType<_LoginScreenState>();
+    final bool disabled = (state?._loading) ?? false;
+
+    late final Widget icon;
+    late final Color fg;
+    late final List<Color> gradient;
+
+    switch (type) {
+      case _SocialType.google:
+        icon = Container(
+          width: 26,
+          height: 26,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            'G',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF4285F4),
+              letterSpacing: -0.4,
+            ),
+          ),
+        );
+        gradient = [
+          Colors.white.withOpacity(0.92),
+          Colors.white.withOpacity(0.86),
+        ];
+        fg = const Color(0xFF1C1C1C);
+        break;
+      case _SocialType.apple:
+        icon = const Icon(
+          Icons.apple,
+          color: Colors.white,
+          size: 26,
+        );
+        gradient = [
+          Colors.white.withOpacity(0.14),
+          Colors.white.withOpacity(0.08),
+        ];
+        fg = Colors.white;
+        break;
+    }
+
+    return GestureDetector(
+      onTap: disabled
+          ? null
+          : () {
+              if (type == _SocialType.google) {
+                state?._handleGoogle();
+              } else {
+                state?._handleApple();
+              }
+            },
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 180),
+        opacity: disabled ? 0.55 : 1,
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: gradient,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(100),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.22),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.20),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              icon,
+              const SizedBox(width: 12),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.15,
+                    color: fg,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
