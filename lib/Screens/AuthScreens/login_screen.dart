@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_validator/form_validator.dart';
 
@@ -27,13 +28,13 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final carHeight = size.height * 0.30;
+    final carHeight = size.height * 0.26;
 
     return Scaffold(
       body: Stack(
         children: [
-            // Gradient background
-          Container(
+          // Background gradient
+            Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -46,27 +47,26 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Scroll (in case of small devices / keyboard)
+          // Scrollable content
           SafeArea(
             child: SingleChildScrollView(
               padding: EdgeInsets.only(
                 left: 20,
                 right: 20,
-                top: size.height * 0.06,
+                top: size.height * 0.055,
                 bottom: 40,
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _BrandHeader(
+                  const _BrandHeader(
                     showTagline: false,
-                    titleSize: 34,
-                    iconSize: 60,
-                    circleSize: 68,
+                    titleSize: 36,
+                    iconSize: 58,
+                    circleSize: 70,
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 26),
 
-                  // Car image (smaller, decorative)
+                  // Car image (brand consistency)
                   SizedBox(
                     height: carHeight,
                     child: FittedBox(
@@ -76,14 +76,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: carHeight,
                         errorBuilder: (c, e, s) => const Icon(
                           Icons.directions_car_filled,
-                          size: 120,
+                          size: 110,
                           color: Colors.white30,
                         ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
                   Text(
                     'Welcome back',
                     style: GoogleFonts.inter(
@@ -112,47 +112,106 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscure: _obscure,
                     onToggleObscure: () => setState(() => _obscure = !_obscure),
                   ),
+
                   const SizedBox(height: 22),
 
-                  _PrimaryButton(
-                    label: _loading ? 'Signing in...' : 'Login',
-                    onTap: _loading ? null : _submit,
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextButton(
-                    onPressed: _loading ? null : _forgotPassword,
-                    child: Text(
-                      'Forgot password?',
-                      style: GoogleFonts.inter(
-                        color: Colors.white.withOpacity(0.9),
-                        fontWeight: FontWeight.w500,
+                  // Gradient-wrapped GetWidget button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF4DA6FF),
+                            Color(0xFF1D64D9),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.28),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
+                          )
+                        ],
+                      ),
+                      child: GFButton(
+                        onPressed: _loading ? null : _submit,
+                        size: GFSize.LARGE,
+                        color: Colors.transparent, // gradient provides color
+                        elevation: 0,
+                        fullWidthButton: true,
+                        textStyle: GoogleFonts.inter(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                        child: _loading
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const GFLoader(
+                                    type: GFLoaderType.circle,
+                                    size: GFSize.SMALL,
+                                    loaderColorOne: Colors.white,
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Text(
+                                    'Signing in...',
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : const Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
+                  GFButton(
+                    onPressed: _loading ? null : _forgotPassword,
+                    type: GFButtonType.transparent,
+                    text: 'Forgot password?',
+                    textStyle: GoogleFonts.inter(
+                      color: Colors.white.withOpacity(0.9),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  const SizedBox(height: 6),
                   Divider(
                     color: Colors.white.withOpacity(0.15),
                     thickness: 1,
                     height: 40,
                   ),
 
+                  // Register prompt
                   Text.rich(
                     TextSpan(
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: Colors.white.withOpacity(0.75),
                       ),
-                      children: [
-                        const TextSpan(text: "Don't have an account? "),
+                      children: const [
+                        TextSpan(text: "Don't have an account? "),
                         TextSpan(
                           text: 'Register',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Color(0xFF8CCBFF),
                             fontWeight: FontWeight.w600,
                           ),
-                          // onTap gesture wrapper (simple)
                         ),
                       ],
                     ),
@@ -163,37 +222,53 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Optional top-left back
+          // Back button (Cupertino style)
           Positioned(
             top: MediaQuery.of(context).padding.top + 4,
             left: 4,
-            child: IconButton(
+            child: GFIconButton(
+              color: Colors.white.withOpacity(0.12),
+              size: GFSize.SMALL,
+              shape: GFIconButtonShape.circle,
               icon: const Icon(CupertinoIcons.back, color: Colors.white),
               onPressed: () => Navigator.of(context).maybePop(),
-              tooltip: 'Back',
             ),
           ),
+
+          // Fullscreen loader overlay (optional visual emphasis)
+          if (_loading)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Container(
+                  color: Colors.black.withOpacity(0.25),
+                  alignment: Alignment.center,
+                  child: const GFLoader(
+                    type: GFLoaderType.circle,
+                    size: GFSize.LARGE,
+                    loaderColorOne: Colors.white,
+                    loaderColorTwo: Color(0xFF8CCBFF),
+                    loaderColorThree: Color(0xFF4DA6FF),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 
-  void _submit() async {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-    // Simulate auth delay
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
     setState(() => _loading = false);
 
-    // TODO: Replace with real navigation after auth
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           'Logged in (placeholder)',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w500,
-          ),
+          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xFF123A91),
         behavior: SnackBarBehavior.floating,
@@ -229,6 +304,61 @@ class _LoginForm extends StatelessWidget {
     required this.obscure,
     required this.onToggleObscure,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    final emailValidator = ValidationBuilder()
+        .minLength(3, 'Too short')
+        .email('Invalid email')
+        .build();
+    final passwordValidator =
+        ValidationBuilder().minLength(6, 'Min 6 chars').build();
+
+    return Form(
+      key: formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: emailCtrl,
+            keyboardType: TextInputType.emailAddress,
+            style: GoogleFonts.inter(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+            cursorColor: const Color(0xFF8CCBFF),
+            decoration: _decoration(
+              label: 'Email',
+              icon: CupertinoIcons.mail,
+            ),
+            validator: (v) => emailValidator(v),
+          ),
+          const SizedBox(height: 18),
+          TextFormField(
+            controller: passwordCtrl,
+            obscureText: obscure,
+            style: GoogleFonts.inter(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+            cursorColor: const Color(0xFF8CCBFF),
+            decoration: _decoration(
+              label: 'Password',
+              icon: CupertinoIcons.lock,
+              suffix: IconButton(
+                splashRadius: 20,
+                icon: Icon(
+                  obscure ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
+                  color: Colors.white.withOpacity(0.80),
+                ),
+                onPressed: onToggleObscure,
+              ),
+            ),
+            validator: (v) => passwordValidator(v),
+          ),
+        ],
+      ),
+    );
+  }
 
   InputDecoration _decoration({
     required String label,
@@ -271,64 +401,9 @@ class _LoginForm extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    final emailValidator = ValidationBuilder()
-        .minLength(3, 'Too short')
-        .email('Invalid email format')
-        .build();
-
-    final passwordValidator = ValidationBuilder()
-        .minLength(6, 'Min 6 chars')
-        .build();
-
-    return Form(
-      key: formKey,
-      child: Column(
-        children: [
-          TextFormField(
-            controller: emailCtrl,
-            keyboardType: TextInputType.emailAddress,
-            style: GoogleFonts.inter(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-            ),
-            validator: emailValidator,
-            decoration: _decoration(
-              label: 'Email',
-              icon: CupertinoIcons.mail,
-            ),
-          ),
-          const SizedBox(height: 18),
-            TextFormField(
-            controller: passwordCtrl,
-            obscureText: obscure,
-            style: GoogleFonts.inter(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-            ),
-            validator: passwordValidator,
-            decoration: _decoration(
-              label: 'Password',
-              icon: CupertinoIcons.lock,
-              suffix: IconButton(
-                splashRadius: 20,
-                icon: Icon(
-                  obscure ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
-                  color: Colors.white.withOpacity(0.80),
-                ),
-                onPressed: onToggleObscure,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-// Reuse brand header (slightly configurable)
+// Reusable brand header (same style as welcome)
 class _BrandHeader extends StatelessWidget {
   final bool showTagline;
   final double titleSize;
@@ -420,59 +495,6 @@ class _GradientText extends StatelessWidget {
       blendMode: BlendMode.srcIn,
       shaderCallback: (rect) => gradient.createShader(rect),
       child: Text(text, style: style),
-    );
-  }
-}
-
-class _PrimaryButton extends StatelessWidget {
-  final String label;
-  final VoidCallback? onTap;
-  const _PrimaryButton({
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final enabled = onTap != null;
-    return GestureDetector(
-      onTap: enabled ? onTap : null,
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 180),
-        opacity: enabled ? 1 : 0.55,
-        child: Container(
-          height: 56,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                Color(0xFF4DA6FF),
-                Color(0xFF1D64D9),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.28),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
-              )
-            ],
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 17,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
