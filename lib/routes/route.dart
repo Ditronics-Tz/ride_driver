@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import '../Screens/welcome.dart';
 import '../Screens/AuthScreens/login_screen.dart';
+import '../Screens/AuthScreens/register_screen.dart';
+import '../Screens/AuthScreens/onboarding.dart';
 
 class AppRoutes {
   static const String welcome = '/welcome';
   static const String login = '/login';
+  static const String register = '/register';
+  static const String onboarding = '/onboarding';
   static const String home = '/home';
   static const String profile = '/profile';
   static const String rides = '/rides';
@@ -13,10 +17,8 @@ class AppRoutes {
   static Map<String, WidgetBuilder> get routes => {
         welcome: (context) => const WelcomeScreen(),
         login: (context) => const LoginScreen(),
-        // home: (context) => const HomeScreen(), // Add when created
-        // profile: (context) => const ProfileScreen(), // Add when created
-        // rides: (context) => const RidesScreen(), // Add when created
-        // earnings: (context) => const EarningsScreen(), // Add when created
+        register: (context) => const RegisterScreen(),
+        onboarding: (context) => const OnboardingScreen(),
       };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -25,6 +27,10 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const WelcomeScreen());
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case register:
+        return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case onboarding:
+        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

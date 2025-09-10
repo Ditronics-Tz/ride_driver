@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_validator/form_validator.dart';
+import '/../routes/route.dart';  
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -218,24 +219,33 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const _SocialLoginRow(),
 
-                  Text.rich(
-                    TextSpan(
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: Colors.white.withOpacity(0.75),
-                      ),
-                      children: const [
-                        TextSpan(text: "Don't have an account? "),
-                        TextSpan(
-                          text: 'Register',
-                          style: TextStyle(
-                            color: Color(0xFF8CCBFF),
-                            fontWeight: FontWeight.w600,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(AppRoutes.register);
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withOpacity(0.78),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.2,
                           ),
+                          children: [
+                            const TextSpan(text: "Don't have an account? "),
+                            TextSpan(
+                              text: 'Register',
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF8CCBFF),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
