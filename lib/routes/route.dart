@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Screens/welcome.dart';
+import '../Screens/AuthScreens/login_screen.dart';
 
 class AppRoutes {
   static const String welcome = '/welcome';
@@ -11,7 +12,7 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> get routes => {
         welcome: (context) => const WelcomeScreen(),
-        // login: (context) => const LoginScreen(), // Add when created
+        login: (context) => const LoginScreen(),
         // home: (context) => const HomeScreen(), // Add when created
         // profile: (context) => const ProfileScreen(), // Add when created
         // rides: (context) => const RidesScreen(), // Add when created
@@ -21,10 +22,12 @@ class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case welcome:
-        return MaterialPageRoute(builder: (context) => const WelcomeScreen());
+        return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+      case login:
+        return MaterialPageRoute(builder: (_) => const LoginScreen());
       default:
         return MaterialPageRoute(
-          builder: (context) => Scaffold(
+          builder: (_) => Scaffold(
             body: Center(
               child: Text('No route defined for ${settings.name}'),
             ),

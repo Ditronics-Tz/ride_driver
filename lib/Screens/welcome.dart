@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../routes/route.dart';  
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -13,14 +15,12 @@ class WelcomeScreen extends StatelessWidget {
           final w = constraints.maxWidth;
 
           // ------------------ TUNING ------------------
-          final carHeightFactor = 0.62;   // Relative height of car to screen
-          final carBottomOvershoot = -14; // Negative => part hidden below bottom
-          final buttonWidth = 100.0;
-          final buttonHeight = 54.0;
-
-          // Position button relative to car: 0 = car bottom, 1 = car top
-          final buttonVerticalFactorOnCar = 0.78;
-          // ------------------------------------------------
+            final carHeightFactor = 0.62;
+            final carBottomOvershoot = -14;
+            final buttonWidth = 100.0;
+            final buttonHeight = 54.0;
+            final buttonVerticalFactorOnCar = 0.78;
+          // ---------------------------------------------
 
           final carHeight = h * carHeightFactor;
           final buttonBottom = carBottomOvershoot +
@@ -43,42 +43,12 @@ class WelcomeScreen extends StatelessWidget {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // Title / Logo
+                  // ---- Improved Brand Header ----
                   Positioned(
-                    top: h * 0.10,
+                    top: h * 0.085,
                     left: 0,
                     right: 0,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.directions_car_outlined,
-                          color: Colors.white,
-                          size: 54,
-                        ),
-                        const SizedBox(height: 10),
-                        RichText(
-                          text: TextSpan(
-                            style: GoogleFonts.inter(
-                              fontSize: 38,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: -0.5,
-                              height: 1.0,
-                            ),
-                            children: const [
-                              TextSpan(
-                                text: 'Ride',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              TextSpan(
-                                text: 'App',
-                                style: TextStyle(color: Color(0xFF6CB4FF)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: const _BrandHeader(),
                   ),
 
                   // Car image
@@ -116,7 +86,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
 
-                  // Start button (floating on car)
+                  // Start button
                   Positioned(
                     left: (w - buttonWidth) / 2,
                     bottom: buttonBottom,
@@ -136,9 +106,102 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   void _handleStartButton(BuildContext context) {
-    // Navigation placeholder (no SnackBars anymore)
-    // Example:
-    // Navigator.of(context).pushNamed('/login');
+    Navigator.of(context).pushNamed(AppRoutes.login);
+  }
+}
+
+// Brand header widget
+class _BrandHeader extends StatelessWidget {
+  const _BrandHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final titleBaseStyle = GoogleFonts.inter(
+      fontSize: 40,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.8,
+      height: 1.05,
+    );
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Icon in soft glass circle
+        Container(
+          width: 74,
+          height: 74,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.10),
+              border: Border.all(
+                width: 1.2,
+                color: Colors.white.withOpacity(0.22),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.25),
+                  blurRadius: 22,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+          alignment: Alignment.center,
+          child: const Icon(
+            CupertinoIcons.car_detailed, // Cleaner iOS-style car icon
+            color: Colors.white,
+            size: 40,
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Gradient brand name
+        _GradientText(
+          'RideApp',
+          style: titleBaseStyle,
+          gradient: const LinearGradient(
+            colors: [
+              Colors.white,
+              Color(0xFF8CCBFF),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        const SizedBox(height: 10),
+        // Tagline row
+        Text(
+          'Join us to start earning',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.inter(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: Colors.white.withOpacity(0.92),
+            letterSpacing: 0.25,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Simple gradient text helper
+class _GradientText extends StatelessWidget {
+  final String text;
+  final TextStyle style;
+  final Gradient gradient;
+  const _GradientText(
+    this.text, {
+    required this.style,
+    required this.gradient,
+   
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      blendMode: BlendMode.srcIn,
+      shaderCallback: (rect) => gradient.createShader(rect),
+      child: Text(text, style: style),
+    );
   }
 }
 
@@ -150,6 +213,7 @@ class _StartButton extends StatelessWidget {
     required this.onTap,
     this.width = 96,
     this.height = 54,
+    
   });
 
   @override
