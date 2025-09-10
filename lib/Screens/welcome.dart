@@ -7,34 +7,43 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF2563EB),
-              Color(0xFF123A91),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final h = constraints.maxHeight;
-              final w = constraints.maxWidth;
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final h = constraints.maxHeight;
+          final w = constraints.maxWidth;
 
-              // Tunable layout numbers (adjust if needed)
-              final carHeight = h * 0.58;          // overall car display height
-              final carBottomOvershoot = -9.0;     // push car slightly off-screen bottom
-              final buttonLiftFromCarBottom = carHeight * 0.38; // how high button floats over car
-              final buttonWidth = 92.0;
-              final buttonHeight = 52.0;
+          // ------------------ TUNING ------------------
+          final carHeightFactor = 0.62;   // Relative height of car to screen
+          final carBottomOvershoot = -14; // Negative => part hidden below bottom
+          final buttonWidth = 100.0;
+          final buttonHeight = 54.0;
 
-              return Stack(
+          // Position button relative to car: 0 = car bottom, 1 = car top
+          final buttonVerticalFactorOnCar = 0.78;
+          // ------------------------------------------------
+
+          final carHeight = h * carHeightFactor;
+          final buttonBottom = carBottomOvershoot +
+              (carHeight * (1 - buttonVerticalFactorOnCar));
+
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF2563EB),
+                  Color(0xFF123A91),
+                ],
+              ),
+            ),
+            child: SafeArea(
+              top: true,
+              bottom: false,
+              child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // Logo + name
+                  // Title / Logo
                   Positioned(
                     top: h * 0.10,
                     left: 0,
@@ -42,8 +51,11 @@ class WelcomeScreen extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.directions_car_outlined,
-                            color: Colors.white, size: 54),
+                        const Icon(
+                          Icons.directions_car_outlined,
+                          color: Colors.white,
+                          size: 54,
+                        ),
                         const SizedBox(height: 10),
                         RichText(
                           text: TextSpan(
@@ -55,11 +67,11 @@ class WelcomeScreen extends StatelessWidget {
                             ),
                             children: const [
                               TextSpan(
-                                text: 'eDri',
+                                text: 'Ride',
                                 style: TextStyle(color: Colors.white),
                               ),
                               TextSpan(
-                                text: 'ver',
+                                text: 'App',
                                 style: TextStyle(color: Color(0xFF6CB4FF)),
                               ),
                             ],
@@ -69,11 +81,11 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
 
-                  // Car (anchored bottom, slightly larger & overshooting)
+                  // Car image
                   Positioned(
                     left: 0,
                     right: 0,
-                    bottom: carBottomOvershoot,
+                    bottom: carBottomOvershoot.toDouble(),
                     child: IgnorePointer(
                       child: SizedBox(
                         height: carHeight,
@@ -104,10 +116,10 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
 
-                  // Button (floats over upper part of the car)
+                  // Start button (floating on car)
                   Positioned(
                     left: (w - buttonWidth) / 2,
-                    bottom: carBottomOvershoot + buttonLiftFromCarBottom,
+                    bottom: buttonBottom,
                     child: _StartButton(
                       width: buttonWidth,
                       height: buttonHeight,
@@ -115,51 +127,18 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              );
-            },
-          ),
-        ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
   void _handleStartButton(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Text(
-              'Starting eDriver...',
-              style: GoogleFonts.inter(color: Colors.white),
-            ),
-          ],
-        ),
-        backgroundColor: const Color(0xFF123A91),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Login screen coming soon!',
-            style: GoogleFonts.inter(),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
-    });
+    // Navigation placeholder (no SnackBars anymore)
+    // Example:
+    // Navigator.of(context).pushNamed('/login');
   }
 }
 
