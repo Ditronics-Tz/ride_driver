@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_validator/form_validator.dart';
+import '../../routes/route.dart'; // <--- add this line if not already present
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -292,6 +293,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   const SizedBox(height: 18),
 
+                  // TEMP TEST REGISTER BUTTON (bypasses validation & terms)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF4DA6FF), Color(0xFF1D64D9)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(100),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.35),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: GFButton(
+                        onPressed: () {
+                          Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
+                        },
+                        size: GFSize.LARGE,
+                        color: Colors.transparent,
+                        elevation: 0,
+                        fullWidthButton: true,
+                        shape: GFButtonShape.pills,
+                        textStyle: GoogleFonts.inter(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                        child: const Text(
+                          'Register (Bypassed)',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
                   // Social row (reuse)
                   const _SocialLoginRow(),
 
@@ -344,6 +389,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _toggleTerms() => setState(() => _acceptedTerms = !_acceptedTerms);
 
   Future<void> _submit() async {
+    // TEMP: Bypass registration form for testing – go straight to onboarding.
+    Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
+    return;
+
+    /*
+    // Original logic (restore when done testing)
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -373,8 +424,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         behavior: SnackBarBehavior.floating,
       ),
     );
-
-    // TODO: Navigate to main app / verification flow
+    */
   }
 }
 
