@@ -20,6 +20,10 @@ class WelcomeScreen extends StatelessWidget {
             final buttonWidth = 100.0;
             final buttonHeight = 54.0;
             final buttonVerticalFactorOnCar = 0.78;
+
+            // NEW: uniform overlay tint (same idea as login screen)
+            final Color  globalOverlayColor  = const Color(0xFF0C3C85);
+            final double globalOverlayOpacity = 0.55; // 0 = none, 1 = solid
           // ---------------------------------------------
 
           final carHeight = h * carHeightFactor;

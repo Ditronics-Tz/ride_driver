@@ -30,8 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
     final size = MediaQuery.of(context).size;
 
     // ---------- TUNING ----------
-    final double carHeightFactor = 0.55;   // How tall the car image area is (fraction of screen height)
-    final double carBottomOvershoot = 0.0; // Use negative (e.g. -20) to push image slightly off-screen
+    final double carHeightFactor = 0.55;     // Fraction of screen height used by the car image
+    final double carBottomOvershoot = 0.0;   // Negative to push image further down/off-screen
+    final Color  globalOverlayColor  = const Color(0xFF0C3C85);
+    final double globalOverlayOpacity = 0.55; // 0 = no tint, 1 = solid
     // ----------------------------
 
     return Scaffold(
@@ -53,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // BOTTOM-ANCHORED car image (was top-anchored before)
+          // BOTTOM-ANCHORED car image (clean: no internal overlay now)
           Positioned(
             left: 0,
             right: 0,
@@ -64,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: size.width,
                 child: Image.asset(
                   'assets/images/md1.png',
-                  fit: BoxFit.cover,            // Try BoxFit.contain if you want the full car visible
+                  fit: BoxFit.cover,
                   alignment: Alignment.bottomCenter,
                   errorBuilder: (c, e, s) => Container(
                     color: const Color(0xFF123A91),
@@ -80,22 +82,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Overlay to keep text readable (fades more towards bottom)
+          // NEW: full-screen uniform overlay tint (removed previous per-image overlay & fade)
           Positioned.fill(
             child: IgnorePointer(
               child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: const [
-                      Color(0xCC1E4FAF), // top tint
-                      Color(0x552563EB), // softer mid
-                      Color(0xEE123A91), // strong bottom for form contrast
-                    ],
-                    stops: const [0.0, 0.42, 1.0],
-                  ),
-                ),
+                color: globalOverlayColor.withOpacity(globalOverlayOpacity),
               ),
             ),
           ),
@@ -164,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(100), // was 16 -> pill
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.35),
@@ -179,6 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.transparent,
                         elevation: 0,
                         fullWidthButton: true,
+                        shape: GFButtonShape.pills, // ensure internal hitbox is pill
                         textStyle: GoogleFonts.inter(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
@@ -252,18 +244,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 4,
-            left: 4,
-            child: GFIconButton(
-              color: Colors.white.withOpacity(0.12),
-              size: GFSize.SMALL,
-              shape: GFIconButtonShape.circle,
-              icon: const Icon(CupertinoIcons.back, color: Colors.white),
-              onPressed: () => Navigator.of(context).maybePop(),
-            ),
-          ),
-
           if (_loading)
             Positioned.fill(
               child: IgnorePointer(
@@ -333,14 +313,32 @@ class _LoginForm extends StatelessWidget {
     required this.onToggleObscure,
   });
 
+  bool _isValidEmail(String v) {
+    final emailRegex = RegExp(r'^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$');
+    return emailRegex.hasMatch(v);
+  }
+
+  bool _isValidPhone(String v) {
+    final phone = v.replaceAll(' ', '');
+    final phoneRegex = RegExp(r'^\+?\d{7,15}$'); // allows + then 7–15 digits
+    return phoneRegex.hasMatch(phone);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final emailValidator = ValidationBuilder()
-        .minLength(3, 'Too short')
-        .email('Invalid email')
+    // Big radius so the field looks like a pill
+    const double pillRadius = 40;
+
+    String? phoneOrEmailValidator(String? v) {
+      if (v == null || v.trim().isEmpty) return 'Required';
+      final value = v.trim();
+      if (_isValidEmail(value) || _isValidPhone(value)) return null;
+      return 'Enter valid email or phone';
+    }
+
+    final passwordValidator = ValidationBuilder()
+        .minLength(6, 'Min 6 chars')
         .build();
-    final passwordValidator =
-        ValidationBuilder().minLength(6, 'Min 6 chars').build();
 
     return Form(
       key: formKey,
@@ -355,12 +353,13 @@ class _LoginForm extends StatelessWidget {
             ),
             cursorColor: const Color(0xFF8CCBFF),
             decoration: _decoration(
-              label: 'Email',
-              icon: CupertinoIcons.mail,
+              label: 'Phone number or Email',
+              icon: CupertinoIcons.person, // changed icon to a neutral one
+              pillRadius: pillRadius,
             ),
-            validator: (v) => emailValidator(v),
+            validator: phoneOrEmailValidator,
           ),
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
           TextFormField(
             controller: passwordCtrl,
             obscureText: obscure,
@@ -372,6 +371,7 @@ class _LoginForm extends StatelessWidget {
             decoration: _decoration(
               label: 'Password',
               icon: CupertinoIcons.lock,
+              pillRadius: pillRadius,
               suffix: IconButton(
                 splashRadius: 20,
                 icon: Icon(
@@ -391,6 +391,7 @@ class _LoginForm extends StatelessWidget {
   InputDecoration _decoration({
     required String label,
     required IconData icon,
+    required double pillRadius,
     Widget? suffix,
   }) {
     return InputDecoration(
@@ -405,28 +406,28 @@ class _LoginForm extends StatelessWidget {
       filled: true,
       fillColor: Colors.white.withOpacity(0.12),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(pillRadius),
         borderSide: BorderSide(
           color: Colors.white.withOpacity(0.16),
           width: 1.1,
         ),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(pillRadius),
         borderSide: const BorderSide(
           color: Color(0xFF8CCBFF),
           width: 1.4,
         ),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(pillRadius),
         borderSide: const BorderSide(color: Colors.redAccent, width: 1.1),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(pillRadius),
         borderSide: const BorderSide(color: Colors.redAccent, width: 1.2),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
     );
   }
 }
