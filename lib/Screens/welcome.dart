@@ -116,7 +116,7 @@ class WelcomeScreen extends StatelessWidget {
 
 // Brand header widget
 class _BrandHeader extends StatelessWidget {
-  const _BrandHeader({super.key});
+  const _BrandHeader();
 
   @override
   Widget build(BuildContext context) {

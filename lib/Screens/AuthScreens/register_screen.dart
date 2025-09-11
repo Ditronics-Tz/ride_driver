@@ -21,7 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _obscurePass = true;
   bool _obscureConfirm = true;
-  bool _loading = false;
+  final bool _loading = false;
   bool _acceptedTerms = false;
 
   @override
@@ -808,7 +808,7 @@ class _SocialButton extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    '${label} login coming soon',
+                    '$label login coming soon',
                     style: GoogleFonts.inter(fontWeight: FontWeight.w500),
                   ),
                   backgroundColor: const Color(0xFF123A91),
