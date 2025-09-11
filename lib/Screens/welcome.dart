@@ -120,7 +120,7 @@ class _BrandHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleBaseStyle = GoogleFonts.inter(
+    final titleBaseStyle = GoogleFonts.poppins(
       fontSize: 40,
       fontWeight: FontWeight.w700,
       letterSpacing: -0.8,
@@ -175,7 +175,7 @@ class _BrandHeader extends StatelessWidget {
         Text(
           'Join us to start earning',
           textAlign: TextAlign.center,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 15,
             fontWeight: FontWeight.w500,
             color: Colors.white.withOpacity(0.92),

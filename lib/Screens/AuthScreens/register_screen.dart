@@ -123,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   Text(
                     'Create your account',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
                       color: Colors.white.withOpacity(0.97),
@@ -134,7 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Text(
                     'Start driving & earning with RideApp',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       color: Colors.white.withOpacity(0.82),
@@ -191,7 +191,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           behavior: HitTestBehavior.translucent,
                           child: Text.rich(
                             TextSpan(
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 13.2,
                                 height: 1.35,
                                 color: Colors.white.withOpacity(0.82),
@@ -258,7 +258,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         elevation: 0,
                         fullWidthButton: true,
                         shape: GFButtonShape.pills,
-                        textStyle: GoogleFonts.inter(
+                        textStyle: GoogleFonts.poppins(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.2,
@@ -275,7 +275,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   const SizedBox(width: 14),
                                   Text(
                                     'Creating...',
-                                    style: GoogleFonts.inter(
+                                    style: GoogleFonts.poppins(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 0.2,
@@ -322,7 +322,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         elevation: 0,
                         fullWidthButton: true,
                         shape: GFButtonShape.pills,
-                        textStyle: GoogleFonts.inter(
+                        textStyle: GoogleFonts.poppins(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.2,
@@ -343,7 +343,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   // Already have account link
                   Text.rich(
                     TextSpan(
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 13,
                         color: Colors.white.withOpacity(0.75),
                       ),
@@ -401,7 +401,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SnackBar(
           content: Text(
             'Please accept the terms first',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
           ),
           backgroundColor: Colors.black87,
           behavior: SnackBarBehavior.floating,
@@ -418,7 +418,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       SnackBar(
         content: Text(
           'Account created (placeholder)',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         backgroundColor: const Color(0xFF123A91),
         behavior: SnackBarBehavior.floating,
@@ -476,7 +476,7 @@ class _RegisterForm extends StatelessWidget {
       labelText: label,
       prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.85)),
       suffixIcon: suffix,
-      labelStyle: GoogleFonts.inter(
+      labelStyle: GoogleFonts.poppins(
         color: Colors.white.withOpacity(0.85),
         fontWeight: FontWeight.w500,
         letterSpacing: 0.2,
@@ -532,7 +532,7 @@ class _RegisterForm extends StatelessWidget {
       return null;
     }
 
-    TextStyle fieldStyle = GoogleFonts.inter(
+    TextStyle fieldStyle = GoogleFonts.poppins(
       color: Colors.white,
       fontWeight: FontWeight.w500,
     );
@@ -626,7 +626,7 @@ class _BrandHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = GoogleFonts.inter(
+    final titleStyle = GoogleFonts.poppins(
       fontSize: titleSize,
       fontWeight: FontWeight.w700,
       letterSpacing: -0.8,
@@ -674,7 +674,7 @@ class _BrandHeader extends StatelessWidget {
           Text(
             'Join us to start earning',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w500,
               color: Colors.white.withOpacity(0.92),
@@ -773,7 +773,7 @@ class _SocialButton extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             'G',
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: const Color(0xFF4285F4),
@@ -809,7 +809,7 @@ class _SocialButton extends StatelessWidget {
                 SnackBar(
                   content: Text(
                     '$label login coming soon',
-                    style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
                   ),
                   backgroundColor: const Color(0xFF123A91),
                   behavior: SnackBarBehavior.floating,
@@ -851,7 +851,7 @@ class _SocialButton extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.1,

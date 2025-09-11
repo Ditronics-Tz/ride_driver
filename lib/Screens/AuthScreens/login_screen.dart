@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   Text(
                     'Welcome back',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
                       color: Colors.white.withOpacity(0.97),
@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     'Sign in to continue driving & earning',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       color: Colors.white.withOpacity(0.82),
@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         elevation: 0,
                         fullWidthButton: true,
                         shape: GFButtonShape.pills,
-                        textStyle: GoogleFonts.inter(
+                        textStyle: GoogleFonts.poppins(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.2,
@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   const SizedBox(width: 14),
                                   Text(
                                     'Signing in...',
-                                    style: GoogleFonts.inter(
+                                    style: GoogleFonts.poppins(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 0.2,
@@ -210,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: _loading ? null : _forgotPassword,
                     type: GFButtonType.transparent,
                     text: 'Forgot password?',
-                    textStyle: GoogleFonts.inter(
+                    textStyle: GoogleFonts.poppins(
                       color: Colors.white.withOpacity(0.9),
                       fontWeight: FontWeight.w500,
                     ),
@@ -227,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: RichText(
                         text: TextSpan(
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             color: Colors.white.withOpacity(0.78),
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -237,7 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const TextSpan(text: "Don't have an account? "),
                             TextSpan(
                               text: 'Register',
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 color: const Color(0xFF8CCBFF),
                                 fontWeight: FontWeight.w700,
                               ),
@@ -284,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
       SnackBar(
         content: Text(
           'Logged in (placeholder)',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xFF123A91),
         behavior: SnackBarBehavior.floating,
@@ -297,7 +297,7 @@ class _LoginScreenState extends State<LoginScreen> {
       SnackBar(
         content: Text(
           'Forgot password flow coming soon',
-          style: GoogleFonts.inter(),
+          style: GoogleFonts.poppins(),
         ),
         backgroundColor: Colors.black87,
         behavior: SnackBarBehavior.floating,
@@ -311,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
       SnackBar(
         content: Text(
           'Google login coming soon',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xFF123A91),
         behavior: SnackBarBehavior.floating,
@@ -325,7 +325,7 @@ class _LoginScreenState extends State<LoginScreen> {
       SnackBar(
         content: Text(
           'Apple login coming soon',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xFF123A91),
         behavior: SnackBarBehavior.floating,
@@ -382,7 +382,7 @@ class _LoginForm extends StatelessWidget {
           TextFormField(
             controller: emailCtrl,
             keyboardType: TextInputType.emailAddress,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
@@ -398,7 +398,7 @@ class _LoginForm extends StatelessWidget {
           TextFormField(
             controller: passwordCtrl,
             obscureText: obscure,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
@@ -433,7 +433,7 @@ class _LoginForm extends StatelessWidget {
       labelText: label,
       prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.85)),
       suffixIcon: suffix,
-      labelStyle: GoogleFonts.inter(
+      labelStyle: GoogleFonts.poppins(
         color: Colors.white.withOpacity(0.85),
         fontWeight: FontWeight.w500,
         letterSpacing: 0.2,
@@ -481,7 +481,7 @@ class _BrandHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = GoogleFonts.inter(
+    final titleStyle = GoogleFonts.poppins(
       fontSize: titleSize,
       fontWeight: FontWeight.w700,
       letterSpacing: -0.8,
@@ -529,7 +529,7 @@ class _BrandHeader extends StatelessWidget {
           Text(
             'Join us to start earning',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w500,
               color: Colors.white.withOpacity(0.92),
@@ -625,7 +625,7 @@ class _SocialButton extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             'G',
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w700,
               color: const Color(0xFF4285F4),
@@ -698,7 +698,7 @@ class _SocialButton extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.15,
