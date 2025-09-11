@@ -14,6 +14,7 @@ dependencies:
 
   
   cupertino_icons: ^1.0.8
+  image_picker: ^1.1.2
   getwidget: ^7.0.0
   shared_preferences: ^2.5.3
   flutter_riverpod: any
