@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import './otp.dart'; // <-- add this
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -264,35 +265,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    if (!_carPhotoAdded || !_idPhotoAdded) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Please add both photos',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-          ),
-          backgroundColor: Colors.black87,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-    setState(() => _loading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    if (!mounted) return;
-    setState(() => _loading = false);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Onboarding submitted (placeholder)',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: const Color(0xFF123A91),
-        behavior: SnackBarBehavior.floating,
+    // TEMP: bypass onboarding and go to OTP directly
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => const OtpScreen(), // phoneMasked has a default
       ),
     );
+    return;
+
+    // if (!_formKey.currentState!.validate()) return;
+    // if (!_carPhotoAdded || !_idPhotoAdded) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text(
+    //         'Please add both photos',
+    //         style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+    //       ),
+    //       backgroundColor: Colors.black87,
+    //       behavior: SnackBarBehavior.floating,
+    //     ),
+    //   );
+    //   return;
+    // }
+    // setState(() => _loading = true);
+    // await Future.delayed(const Duration(seconds: 1));
+    // if (!mounted) return;
+    // setState(() => _loading = false);
+
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(
+    //       'Onboarding submitted (placeholder)',
+    //       style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+    //     ),
+    //     backgroundColor: const Color(0xFF123A91),
+    //     behavior: SnackBarBehavior.floating,
+    //   ),
+    // );
 
     // Navigate to home or next flow (placeholder)
     // Navigator.of(context).pushReplacementNamed(AppRoutes.home);

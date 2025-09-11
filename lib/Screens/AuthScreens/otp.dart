@@ -382,7 +382,7 @@ class _TopBrandHeader extends StatelessWidget {
                   children: [
                     const TextSpan(text: 'Welcome to '),
                     TextSpan(
-                      text: 'eDriver',
+                      text: 'Ride',
                       style: welcomeStyle.copyWith(color: const Color(0xFF1D64D9)),
                     ),
                   ],
@@ -405,7 +405,7 @@ class _TopBrandHeader extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'eDriver',
+              'Ride',
               style: GoogleFonts.inter(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
