@@ -6,10 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneMasked; // e.g. "+255 ....."
-  const OtpScreen({
-    super.key,
-    this.phoneMasked = '+255 .....',
-  });
+  const OtpScreen({super.key, this.phoneMasked = '+255 .....'});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -17,17 +14,26 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen> {
   static const int _otpLength = 4;
-  final List<TextEditingController> _controllers =
-      List.generate(_otpLength, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes =
-      List.generate(_otpLength, (_) => FocusNode());
+  final List<TextEditingController> _controllers = List.generate(
+    _otpLength,
+    (_) => TextEditingController(),
+  );
+  final List<FocusNode> _focusNodes = List.generate(
+    _otpLength,
+    (_) => FocusNode(),
+  );
 
   bool _submitting = false;
   int _secondsLeft = 30;
   Timer? _timer;
 
-  TextStyle gText(double size, FontWeight weight,
-      {Color? color, double? letterSpacing, double? height}) {
+  TextStyle gText(
+    double size,
+    FontWeight weight, {
+    Color? color,
+    double? letterSpacing,
+    double? height,
+  }) {
     return GoogleFonts.poppins(
       fontSize: size,
       fontWeight: weight,
@@ -117,8 +123,8 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
     );
 
-    // TODO: Navigate to next flow
-    // Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
+    // Navigate to main navigation
+    Navigator.of(context).pushReplacementNamed('/main');
   }
 
   void _resend() {
@@ -166,21 +172,30 @@ class _OtpScreenState extends State<OtpScreen> {
                   const SizedBox(height: 12),
                   Text(
                     'We have sent an OTP on a given Number\n${widget.phoneMasked}',
-                    style: gText(16, FontWeight.w500,
-                        color: const Color(0xFF1C2A3A), height: 1.4),
+                    style: gText(
+                      16,
+                      FontWeight.w500,
+                      color: const Color(0xFF1C2A3A),
+                      height: 1.4,
+                    ),
                   ),
                   const SizedBox(height: 28),
                   Text(
                     'Enter OTP code',
-                    style: gText(15.5, FontWeight.w600,
-                        color: const Color(0xFF1C2A3A)),
+                    style: gText(
+                      15.5,
+                      FontWeight.w600,
+                      color: const Color(0xFF1C2A3A),
+                    ),
                   ),
                   const SizedBox(height: 14),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: List.generate(_otpLength, (i) {
                       return Padding(
-                        padding: EdgeInsets.only(right: i == _otpLength - 1 ? 0 : 12),
+                        padding: EdgeInsets.only(
+                          right: i == _otpLength - 1 ? 0 : 12,
+                        ),
                         child: _OtpBox(
                           controller: _controllers[i],
                           focusNode: _focusNodes[i],
@@ -194,8 +209,11 @@ class _OtpScreenState extends State<OtpScreen> {
                   const SizedBox(height: 20),
                   RichText(
                     text: TextSpan(
-                      style: gText(15, FontWeight.w500,
-                          color: const Color(0xFF1C2A3A)),
+                      style: gText(
+                        15,
+                        FontWeight.w500,
+                        color: const Color(0xFF1C2A3A),
+                      ),
                       children: [
                         const TextSpan(text: "Don't receive an OTP? "),
                         WidgetSpan(
@@ -204,9 +222,14 @@ class _OtpScreenState extends State<OtpScreen> {
                           child: GestureDetector(
                             onTap: _resend,
                             child: Text(
-                              _secondsLeft > 0 ? 'Resend (${_secondsLeft}s)' : 'Resend',
-                              style: gText(15, FontWeight.w600,
-                                  color: const Color(0xFF1D64D9)),
+                              _secondsLeft > 0
+                                  ? 'Resend (${_secondsLeft}s)'
+                                  : 'Resend',
+                              style: gText(
+                                15,
+                                FontWeight.w600,
+                                color: const Color(0xFF1D64D9),
+                              ),
                             ),
                           ),
                         ),
@@ -237,19 +260,30 @@ class _OtpScreenState extends State<OtpScreen> {
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.4,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 14),
-                                Text('Verifying...', style: gText(17, FontWeight.w600)),
+                                Text(
+                                  'Verifying...',
+                                  style: gText(17, FontWeight.w600),
+                                ),
                               ],
                             )
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Continue', style: gText(18, FontWeight.w600)),
+                                Text(
+                                  'Continue',
+                                  style: gText(18, FontWeight.w600),
+                                ),
                                 const SizedBox(width: 8),
-                                const Icon(CupertinoIcons.arrow_right, size: 20),
+                                const Icon(
+                                  CupertinoIcons.arrow_right,
+                                  size: 20,
+                                ),
                               ],
                             ),
                     ),
@@ -270,7 +304,10 @@ class _OtpScreenState extends State<OtpScreen> {
     return RichText(
       text: TextSpan(
         children: [
-          TextSpan(text: 'OTP', style: title.copyWith(color: const Color(0xFF1D64D9))),
+          TextSpan(
+            text: 'OTP',
+            style: title.copyWith(color: const Color(0xFF1D64D9)),
+          ),
           TextSpan(text: ' verification', style: title),
         ],
       ),
@@ -283,8 +320,14 @@ class _OtpBox extends StatefulWidget {
   final FocusNode focusNode;
   final ValueChanged<String> onChanged;
   final ValueChanged<RawKeyEvent> onKey;
-  final TextStyle Function(double, FontWeight,
-      {Color? color, double? letterSpacing, double? height}) textBuilder;
+  final TextStyle Function(
+    double,
+    FontWeight, {
+    Color? color,
+    double? letterSpacing,
+    double? height,
+  })
+  textBuilder;
 
   const _OtpBox({
     required this.controller,
@@ -330,7 +373,11 @@ class _OtpBoxState extends State<_OtpBox> {
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           textInputAction: TextInputAction.next,
           maxLength: 1,
-          style: widget.textBuilder(24, FontWeight.w700, color: const Color(0xFF0E2033)),
+          style: widget.textBuilder(
+            24,
+            FontWeight.w700,
+            color: const Color(0xFF0E2033),
+          ),
           cursorColor: borderColor,
           decoration: InputDecoration(
             counterText: '',
@@ -339,7 +386,10 @@ class _OtpBoxState extends State<_OtpBox> {
             contentPadding: EdgeInsets.zero,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: borderColor.withOpacity(0.55), width: 1.2),
+              borderSide: BorderSide(
+                color: borderColor.withOpacity(0.55),
+                width: 1.2,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -354,17 +404,30 @@ class _OtpBoxState extends State<_OtpBox> {
 }
 
 class _TopBrandHeader extends StatelessWidget {
-  final TextStyle Function(double, FontWeight,
-      {Color? color, double? letterSpacing, double? height}) textBuilder;
+  final TextStyle Function(
+    double,
+    FontWeight, {
+    Color? color,
+    double? letterSpacing,
+    double? height,
+  })
+  textBuilder;
 
   const _TopBrandHeader({required this.textBuilder});
 
   @override
   Widget build(BuildContext context) {
-    final welcomeStyle =
-        textBuilder(17.5, FontWeight.w600, color: const Color(0xFF0E2033));
-    final subtitleStyle =
-        textBuilder(14, FontWeight.w500, color: const Color(0xFF2F3B52), height: 1.25);
+    final welcomeStyle = textBuilder(
+      17.5,
+      FontWeight.w600,
+      color: const Color(0xFF0E2033),
+    );
+    final subtitleStyle = textBuilder(
+      14,
+      FontWeight.w500,
+      color: const Color(0xFF2F3B52),
+      height: 1.25,
+    );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,8 +443,9 @@ class _TopBrandHeader extends StatelessWidget {
                     const TextSpan(text: 'Welcome to '),
                     TextSpan(
                       text: 'Ride',
-                      style:
-                          welcomeStyle.copyWith(color: const Color(0xFF1D64D9)),
+                      style: welcomeStyle.copyWith(
+                        color: const Color(0xFF1D64D9),
+                      ),
                     ),
                   ],
                 ),
@@ -393,14 +457,22 @@ class _TopBrandHeader extends StatelessWidget {
         ),
         Column(
           children: [
-            const Icon(CupertinoIcons.car_detailed, size: 30, color: Color(0xFF1D64D9)),
+            const Icon(
+              CupertinoIcons.car_detailed,
+              size: 30,
+              color: Color(0xFF1D64D9),
+            ),
             const SizedBox(height: 4),
             Text(
               'Ride',
-              style: textBuilder(14.5, FontWeight.w600, color: const Color(0xFF1D64D9)),
+              style: textBuilder(
+                14.5,
+                FontWeight.w600,
+                color: const Color(0xFF1D64D9),
+              ),
             ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -408,8 +480,14 @@ class _TopBrandHeader extends StatelessWidget {
 
 class _BottomFooter extends StatelessWidget {
   final double height;
-  final TextStyle Function(double, FontWeight,
-      {Color? color, double? letterSpacing, double? height}) textBuilder;
+  final TextStyle Function(
+    double,
+    FontWeight, {
+    Color? color,
+    double? letterSpacing,
+    double? height,
+  })
+  textBuilder;
 
   const _BottomFooter({required this.height, required this.textBuilder});
 
@@ -431,14 +509,20 @@ class _BottomFooter extends StatelessWidget {
           children: [
             Text(
               'Your trusted ride partner',
-              style:
-                  textBuilder(15, FontWeight.w700, color: const Color(0xFF1C2A3A)),
+              style: textBuilder(
+                15,
+                FontWeight.w700,
+                color: const Color(0xFF1C2A3A),
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               'Trusted by Thousands of Drivers',
-              style: textBuilder(14, FontWeight.w500,
-                  color: const Color(0xFF1C2A3A).withOpacity(0.85)),
+              style: textBuilder(
+                14,
+                FontWeight.w500,
+                color: const Color(0xFF1C2A3A).withOpacity(0.85),
+              ),
             ),
           ],
         ),

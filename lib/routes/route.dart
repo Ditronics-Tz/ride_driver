@@ -3,23 +3,26 @@ import '../Screens/welcome.dart';
 import '../Screens/AuthScreens/login_screen.dart';
 import '../Screens/AuthScreens/register_screen.dart';
 import '../Screens/AuthScreens/onboarding.dart';
+import '../Screens/DriverScreens/main_navigation.dart';
 
 class AppRoutes {
   static const String welcome = '/welcome';
   static const String login = '/login';
   static const String register = '/register';
   static const String onboarding = '/onboarding';
+  static const String mainNavigation = '/main';
   static const String home = '/home';
   static const String profile = '/profile';
   static const String rides = '/rides';
   static const String earnings = '/earnings';
 
   static Map<String, WidgetBuilder> get routes => {
-        welcome: (context) => const WelcomeScreen(),
-        login: (context) => const LoginScreen(),
-        register: (context) => const RegisterScreen(),
-        onboarding: (context) => const OnboardingScreen(),
-      };
+    welcome: (context) => const WelcomeScreen(),
+    login: (context) => const LoginScreen(),
+    register: (context) => const RegisterScreen(),
+    onboarding: (context) => const OnboardingScreen(),
+    mainNavigation: (context) => const MainNavigationScreen(),
+  };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -31,12 +34,12 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case onboarding:
         return MaterialPageRoute(builder: (_) => const OnboardingScreen());
+      case mainNavigation:
+        return MaterialPageRoute(builder: (_) => const MainNavigationScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
-            body: Center(
-              child: Text('No route defined for ${settings.name}'),
-            ),
+            body: Center(child: Text('No route defined for ${settings.name}')),
           ),
         );
     }
