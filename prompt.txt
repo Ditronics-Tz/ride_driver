@@ -1,0 +1,89 @@
+You are to generate Flutter code for a ride-share **driver-side app**.  
+⚡ Requirements:  
+- DO NOT delete or rewrite existing screens (Login, Register, Onboarding, OTP).  
+- ONLY add the new screens listed below.  
+- Follow the **existing color scheme, theme, and styles** of the app.  
+- Use **Poppins** as the global font (via google_fonts).  
+- UI must be **modern, minimal, with soft rounded corners, spacing, and shadows**.  
+- All state management must use **Riverpod**.  
+- Forms must use **form_validator**.  
+- Show snackbars using **awesome_snackbar_content**.  
+- Store tokens/sessions with **shared_preferences**.  
+- Location & maps must use **flutter_map + geolocator + geocoding**.  
+- UI components should use **getwidget** where applicable.  
+- Add **mock/test navigation** so I can pass through screens without backend.  
+- Backend calls must be **placeholder functions** (e.g. `Future<void> mockApiCall()`).
+
+---
+
+### 🚖 New Screens To Add
+
+1. **Driver Verification / KYC**
+   - Upload driver license & car registration using `image_picker`.
+   - Show status: Pending, Approved, or Rejected.
+
+2. **Home / Dashboard**
+   - Map with current location.
+   - Button: “Start Route”.
+   - Ongoing route summary (start, destination, seats, fare).
+   - Section for ride requests.
+
+3. **Route Creation**
+   - Select Start & Destination (geocoding lookup).
+   - Choose available seats (up to 4).
+   - Enter/confirm fare.
+   - Publish route.
+
+4. **Ride Requests**
+   - Show incoming requests list.
+   - Accept/Reject passenger.
+   - Mid-journey request popups.
+   - Passenger details preview (name, profile, rating).
+
+5. **Active Trip Management**
+   - Live map with route polyline.
+   - List of onboard passengers & seats left.
+   - Button to cancel/complete trip.
+   - Real-time mid-route join requests.
+
+6. **Passengers View**
+   - Show accepted passengers with pickup/drop-off.
+   - Contact passenger (call/SMS button).
+   - Show cost-sharing breakdown (e.g. 20,000 ÷ 3 = 6,666 TZS).
+
+7. **Earnings & History**
+   - Daily/Weekly/Monthly earnings.
+   - Completed trips list.
+   - Fare breakdown per trip.
+
+8. **Profile & Settings**
+   - Driver profile (name, car details, verification status).
+   - Edit profile (requires re-auth with password).
+   - Change password, Logout.
+   - Language & theme options.
+
+9. **Notifications**
+   - Ride request notifications.
+   - Earnings/payment updates.
+   - Verification status updates.
+
+---
+
+### ⚡ State Management (Riverpod Providers)
+- `AuthProvider` → login, register, OTP, re-auth password.  
+- `DriverProvider` → driver info, car details, verification.  
+- `RouteProvider` → current route, seats, fare.  
+- `RequestProvider` → incoming passenger requests.  
+- `TripProvider` → live trip data, onboard passengers.  
+- `EarningsProvider` → history and payouts.  
+
+---
+
+### 🧪 Testing & Navigation
+- Provide a **navigation drawer or bottom nav bar** to switch between screens for testing.  
+- Each screen must be reachable even without backend.  
+- Mock data where needed.  
+
+---
+
+🚀 Deliver the full Flutter code with the above requirements. Keep the existing screens untouched, only add the new ones, and ensure everything uses **Poppins font + modern design**.
