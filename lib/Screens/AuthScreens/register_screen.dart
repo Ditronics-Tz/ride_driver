@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_validator/form_validator.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import '../../routes/route.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -35,33 +36,99 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _toggleTerms() => setState(() => _acceptedTerms = !_acceptedTerms);
 
+  void _showAwesomeSnackbar({
+    required String title,
+    required String message,
+    required ContentType contentType,
+  }) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: title,
+        message: message,
+        contentType: contentType,
+      ),
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
+  }
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      _showAwesomeSnackbar(
+        title: 'Validation Error',
+        message: 'Please fill all fields correctly',
+        contentType: ContentType.warning,
+      );
+      return;
+    }
+    
+    if (!_acceptedTerms) {
+      _showAwesomeSnackbar(
+        title: 'Terms Required',
+        message: 'Please accept terms and conditions to continue',
+        contentType: ContentType.warning,
+      );
+      return;
+    }
     
     setState(() => _loading = true);
-    // Simulate registration process
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _loading = false);
     
-    if (!mounted) return;
-    
-    // Navigate to OTP screen
-    Navigator.of(context).pushReplacementNamed(AppRoutes.otp);
+    try {
+      // Simulate registration process
+      await Future.delayed(const Duration(seconds: 2));
+      
+      if (!mounted) return;
+      
+      _showAwesomeSnackbar(
+        title: 'Success!',
+        message: 'Account created successfully',
+        contentType: ContentType.success,
+      );
+      
+      // Navigate to OTP screen after a short delay
+      await Future.delayed(const Duration(milliseconds: 1500));
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed(AppRoutes.otp);
+      
+    } catch (e) {
+      _showAwesomeSnackbar(
+        title: 'Error',
+        message: 'Failed to create account. Please try again.',
+        contentType: ContentType.failure,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  // Check if form is filled to show next components
+  bool get _isFormFilled {
+    return _nameCtrl.text.isNotEmpty && 
+           _contactCtrl.text.isNotEmpty && 
+           _passwordCtrl.text.isNotEmpty && 
+           _confirmCtrl.text.isNotEmpty;
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     final double carHeightFactor = 0.55;
     final double carBottomOvershoot = 0.0;
     final Color globalOverlayColor = const Color(0xFF0C3C85);
     final double globalOverlayOpacity = 0.55;
     const double pillRadius = 40;
 
-    final canSubmit = !_loading && _acceptedTerms;
+    final canSubmit = !_loading && _acceptedTerms && _isFormFilled;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true, // This helps with keyboard issues
       body: Stack(
         children: [
           // Background gradient
@@ -116,265 +183,234 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
 
-          // Content
+          // Content - Scrollable to prevent overflow
           SafeArea(
             child: SingleChildScrollView(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: size.height * 0.055,
-                bottom: 40,
-              ),
-              child: Column(
-                children: [
-                  const _BrandHeader(
-                    showTagline: false,
-                    titleSize: 36,
-                    iconSize: 56,
-                    circleSize: 70,
-                  ),
-                  const SizedBox(height: 30),
-
-                  Text(
-                    'Create your account',
-                    style: GoogleFonts.poppins(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white.withOpacity(0.97),
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Start driving & earning with RideApp',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white.withOpacity(0.82),
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  _RegisterForm(
-                    formKey: _formKey,
-                    nameCtrl: _nameCtrl,
-                    contactCtrl: _contactCtrl,
-                    passwordCtrl: _passwordCtrl,
-                    confirmCtrl: _confirmCtrl,
-                    obscurePass: _obscurePass,
-                    obscureConfirm: _obscureConfirm,
-                    onTogglePass: () => setState(() => _obscurePass = !_obscurePass),
-                    onToggleConfirm: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                    pillRadius: pillRadius,
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Terms acceptance
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
                     children: [
-                      GestureDetector(
-                        onTap: _toggleTerms,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: _acceptedTerms
-                                ? const Color(0xFF4DA6FF)
-                                : Colors.white.withOpacity(0.10),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.25),
-                              width: 1.1,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: _acceptedTerms
-                              ? const Icon(Icons.check, size: 16, color: Colors.white)
-                              : null,
+                      const SizedBox(height: 20),
+                      
+                      // Header section
+                      const _BrandHeader(
+                        showTagline: false,
+                        titleSize: 28,
+                        iconSize: 42,
+                        circleSize: 55,
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      Text(
+                        'Create your account',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withOpacity(0.97),
+                          letterSpacing: -0.2,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: _toggleTerms,
-                          behavior: HitTestBehavior.translucent,
-                          child: Text.rich(
-                            TextSpan(
-                              style: GoogleFonts.poppins(
-                                fontSize: 13.2,
-                                height: 1.35,
-                                color: Colors.white.withOpacity(0.82),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Start driving & earning with RideApp',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white.withOpacity(0.82),
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+
+                      // Form section
+                      _RegisterForm(
+                        formKey: _formKey,
+                        nameCtrl: _nameCtrl,
+                        contactCtrl: _contactCtrl,
+                        passwordCtrl: _passwordCtrl,
+                        confirmCtrl: _confirmCtrl,
+                        obscurePass: _obscurePass,
+                        obscureConfirm: _obscureConfirm,
+                        onTogglePass: () => setState(() => _obscurePass = !_obscurePass),
+                        onToggleConfirm: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                        pillRadius: pillRadius,
+                        onFormChanged: () => setState(() {}), // Trigger rebuild when form changes
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Terms acceptance - always visible, just faded when form not filled
+                      AnimatedOpacity(
+                        opacity: _isFormFilled ? 1.0 : 0.5,
+                        duration: const Duration(milliseconds: 300),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: _toggleTerms,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 180),
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: _acceptedTerms
+                                      ? const Color(0xFF4DA6FF)
+                                      : Colors.white.withOpacity(0.10),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.25),
+                                    width: 1.1,
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: _acceptedTerms
+                                    ? const Icon(Icons.check, size: 14, color: Colors.white)
+                                    : null,
                               ),
-                              children: const [
-                                TextSpan(text: 'I agree to the '),
-                                TextSpan(
-                                  text: 'Terms of Service',
-                                  style: TextStyle(
-                                    color: Color(0xFF8CCBFF),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                TextSpan(text: ' & '),
-                                TextSpan(
-                                  text: 'Privacy Policy',
-                                  style: TextStyle(
-                                    color: Color(0xFF8CCBFF),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
                             ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: _toggleTerms,
+                                behavior: HitTestBehavior.translucent,
+                                child: Text.rich(
+                                  TextSpan(
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      height: 1.3,
+                                      color: Colors.white.withOpacity(0.82),
+                                    ),
+                                    children: const [
+                                      TextSpan(text: 'I agree to the '),
+                                      TextSpan(
+                                        text: 'Terms of Service',
+                                        style: TextStyle(
+                                          color: Color(0xFF8CCBFF),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      TextSpan(text: ' & '),
+                                      TextSpan(
+                                        text: 'Privacy Policy',
+                                        style: TextStyle(
+                                          color: Color(0xFF8CCBFF),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Register button - always visible with minimal opacity change
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: canSubmit
+                                ? const LinearGradient(
+                                    colors: [Color(0xFF4DA6FF), Color(0xFF1D64D9)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                : LinearGradient(
+                                    colors: [
+                                      const Color(0xFF4DA6FF).withOpacity(0.7), // Less transparent
+                                      const Color(0xFF1D64D9).withOpacity(0.7), // Less transparent
+                                    ],
+                                  ),
+                            borderRadius: BorderRadius.circular(100),
+                            boxShadow: [
+                              if (canSubmit)
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.25),
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 8),
+                                ),
+                            ],
+                          ),
+                          child: GFButton(
+                            onPressed: canSubmit ? _submit : () {
+                              // Show helpful message when button is disabled
+                              if (!_isFormFilled) {
+                                _showAwesomeSnackbar(
+                                  title: 'Form Incomplete',
+                                  message: 'Please fill all fields first',
+                                  contentType: ContentType.help,
+                                );
+                              } else if (!_acceptedTerms) {
+                                _showAwesomeSnackbar(
+                                  title: 'Terms Required',
+                                  message: 'Please accept terms and conditions',
+                                  contentType: ContentType.help,
+                                );
+                              }
+                            },
+                            size: GFSize.LARGE,
+                            color: Colors.transparent,
+                            elevation: 0,
+                            fullWidthButton: true,
+                            shape: GFButtonShape.pills,
+                            textStyle: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.2,
+                            ),
+                            child: _loading
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const GFLoader(
+                                        type: GFLoaderType.circle,
+                                        size: GFSize.SMALL,
+                                        loaderColorOne: Colors.white,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        'Creating...',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 0.2,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const Text(
+                                    'Register',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                           ),
                         ),
                       ),
+
+                      const SizedBox(height: 16),
+
+                      // Social row
+                      const _SocialLoginRow(),
+
+                      const SizedBox(height: 12),
+
+                      // Login link
+                      const _LoginLink(),
+
+                      const SizedBox(height: 30), // Bottom padding
                     ],
                   ),
-
-                  const SizedBox(height: 22),
-
-                  // Register button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: canSubmit
-                            ? const LinearGradient(
-                                colors: [Color(0xFF4DA6FF), Color(0xFF1D64D9)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              )
-                            : LinearGradient(
-                                colors: [
-                                  const Color(0xFF4DA6FF).withOpacity(0.45),
-                                  const Color(0xFF1D64D9).withOpacity(0.45),
-                                ],
-                              ),
-                        borderRadius: BorderRadius.circular(100),
-                        boxShadow: [
-                          if (canSubmit)
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.35),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                        ],
-                      ),
-                      child: GFButton(
-                        onPressed: canSubmit ? _submit : null,
-                        size: GFSize.LARGE,
-                        color: Colors.transparent,
-                        elevation: 0,
-                        fullWidthButton: true,
-                        shape: GFButtonShape.pills,
-                        textStyle: GoogleFonts.poppins(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
-                        ),
-                        child: _loading
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const GFLoader(
-                                    type: GFLoaderType.circle,
-                                    size: GFSize.SMALL,
-                                    loaderColorOne: Colors.white,
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Text(
-                                    'Creating...',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.2,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : const Text(
-                                'Register',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  // TEMP TEST REGISTER BUTTON (bypasses validation & terms)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF4DA6FF), Color(0xFF1D64D9)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(100),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.35),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: GFButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacementNamed(AppRoutes.otp);
-                        },
-                        size: GFSize.LARGE,
-                        color: Colors.transparent,
-                        elevation: 0,
-                        fullWidthButton: true,
-                        shape: GFButtonShape.pills,
-                        textStyle: GoogleFonts.poppins(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
-                        ),
-                        child: const Text(
-                          'Register (Bypassed)',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  // Social row
-                  const _SocialLoginRow(),
-
-                  // Already have account link
-                  Text.rich(
-                    TextSpan(
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: Colors.white.withOpacity(0.75),
-                      ),
-                      children: const [
-                        TextSpan(text: 'Already have an account? '),
-                        TextSpan(
-                          text: 'Login',
-                          style: TextStyle(
-                            color: Color(0xFF8CCBFF),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -412,6 +448,7 @@ class _RegisterForm extends StatelessWidget {
   final VoidCallback onTogglePass;
   final VoidCallback onToggleConfirm;
   final double pillRadius;
+  final VoidCallback onFormChanged;
 
   const _RegisterForm({
     required this.formKey,
@@ -424,6 +461,7 @@ class _RegisterForm extends StatelessWidget {
     required this.onTogglePass,
     required this.onToggleConfirm,
     required this.pillRadius,
+    required this.onFormChanged,
   });
 
   bool _isValidEmail(String v) {
@@ -445,12 +483,13 @@ class _RegisterForm extends StatelessWidget {
   }) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.85)),
+      prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.85), size: 20),
       suffixIcon: suffix,
       labelStyle: GoogleFonts.poppins(
         color: Colors.white.withOpacity(0.85),
         fontWeight: FontWeight.w500,
         letterSpacing: 0.2,
+        fontSize: 13,
       ),
       filled: true,
       fillColor: Colors.white.withOpacity(0.12),
@@ -476,7 +515,7 @@ class _RegisterForm extends StatelessWidget {
         borderRadius: BorderRadius.circular(pillRadius),
         borderSide: const BorderSide(color: Colors.redAccent, width: 1.2),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
     );
   }
 
@@ -506,6 +545,7 @@ class _RegisterForm extends StatelessWidget {
     TextStyle fieldStyle = GoogleFonts.poppins(
       color: Colors.white,
       fontWeight: FontWeight.w500,
+      fontSize: 14,
     );
 
     return Form(
@@ -522,8 +562,9 @@ class _RegisterForm extends StatelessWidget {
               icon: CupertinoIcons.person_crop_circle,
             ),
             validator: nameValidator,
+            onChanged: (_) => onFormChanged(),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           TextFormField(
             controller: contactCtrl,
             keyboardType: TextInputType.emailAddress,
@@ -534,8 +575,9 @@ class _RegisterForm extends StatelessWidget {
               icon: CupertinoIcons.phone,
             ),
             validator: contactValidator,
+            onChanged: (_) => onFormChanged(),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           TextFormField(
             controller: passwordCtrl,
             obscureText: obscurePass,
@@ -549,13 +591,15 @@ class _RegisterForm extends StatelessWidget {
                 icon: Icon(
                   obscurePass ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
                   color: Colors.white.withOpacity(0.80),
+                  size: 20,
                 ),
                 onPressed: onTogglePass,
               ),
             ),
             validator: passwordValidator,
+            onChanged: (_) => onFormChanged(),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           TextFormField(
             controller: confirmCtrl,
             obscureText: obscureConfirm,
@@ -569,11 +613,13 @@ class _RegisterForm extends StatelessWidget {
                 icon: Icon(
                   obscureConfirm ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
                   color: Colors.white.withOpacity(0.80),
+                  size: 20,
                 ),
                 onPressed: onToggleConfirm,
               ),
             ),
             validator: confirmValidator,
+            onChanged: (_) => onFormChanged(),
           ),
         ],
       ),
@@ -628,7 +674,7 @@ class _BrandHeader extends StatelessWidget {
             size: iconSize,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _GradientText(
           'RideApp',
           style: titleStyle,
@@ -639,12 +685,12 @@ class _BrandHeader extends StatelessWidget {
           ),
         ),
         if (showTagline) ...[
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             'Join us to start earning',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Colors.white.withOpacity(0.92),
               letterSpacing: 0.25,
@@ -679,29 +725,45 @@ class _GradientText extends StatelessWidget {
 class _SocialLoginRow extends StatelessWidget {
   const _SocialLoginRow();
 
+  void _showSocialSnackbar(BuildContext context, String label) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Coming Soon!',
+        message: '$label login will be available soon',
+        contentType: ContentType.help,
+      ),
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: SizedBox(
-        height: 52,
-        child: Row(
-          children: const [
-            Expanded(
-              child: _SocialButton(
-                type: _SocialType.google,
-                label: 'Google',
-              ),
+    return SizedBox(
+      height: 44,
+      child: Row(
+        children: [
+          Expanded(
+            child: _SocialButton(
+              type: _SocialType.google,
+              label: 'Google',
+              onTap: () => _showSocialSnackbar(context, 'Google'),
             ),
-            SizedBox(width: 14),
-            Expanded(
-              child: _SocialButton(
-                type: _SocialType.apple,
-                label: 'Apple',
-              ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _SocialButton(
+              type: _SocialType.apple,
+              label: 'Apple',
+              onTap: () => _showSocialSnackbar(context, 'Apple'),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -712,9 +774,12 @@ enum _SocialType { google, apple }
 class _SocialButton extends StatelessWidget {
   final _SocialType type;
   final String label;
+  final VoidCallback onTap;
+  
   const _SocialButton({
     required this.type,
     required this.label,
+    required this.onTap,
   });
 
   @override
@@ -726,8 +791,8 @@ class _SocialButton extends StatelessWidget {
     switch (type) {
       case _SocialType.google:
         icon = Container(
-          width: 24,
-          height: 24,
+          width: 20,
+          height: 20,
           decoration: BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
@@ -737,7 +802,7 @@ class _SocialButton extends StatelessWidget {
           child: Text(
             'G',
             style: GoogleFonts.poppins(
-              fontSize: 13,
+              fontSize: 11,
               fontWeight: FontWeight.w700,
               color: const Color(0xFF4285F4),
               letterSpacing: -0.4,
@@ -754,7 +819,7 @@ class _SocialButton extends StatelessWidget {
         icon = const Icon(
           Icons.apple,
           color: Colors.white,
-          size: 24,
+          size: 20,
         );
         gradient = [
           Colors.white.withOpacity(0.14),
@@ -765,18 +830,7 @@ class _SocialButton extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '$label login coming soon',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-            ),
-            backgroundColor: const Color(0xFF123A91),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      },
+      onTap: onTap,
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
@@ -798,19 +852,19 @@ class _SocialButton extends StatelessWidget {
             ),
           ],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             icon,
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             Flexible(
               child: Text(
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.poppins(
-                  fontSize: 13.5,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.1,
                   color: fg,
@@ -820,6 +874,33 @@ class _SocialButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _LoginLink extends StatelessWidget {
+  const _LoginLink();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        style: GoogleFonts.poppins(
+          fontSize: 12,
+          color: Colors.white.withOpacity(0.75),
+        ),
+        children: const [
+          TextSpan(text: 'Already have an account? '),
+          TextSpan(
+            text: 'Login',
+            style: TextStyle(
+              color: Color(0xFF8CCBFF),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+      textAlign: TextAlign.center,
     );
   }
 }
