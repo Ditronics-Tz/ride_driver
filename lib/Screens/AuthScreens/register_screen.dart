@@ -58,54 +58,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
-      _showAwesomeSnackbar(
-        title: 'Validation Error',
-        message: 'Please fill all fields correctly',
-        contentType: ContentType.warning,
-      );
-      return;
-    }
-    
-    if (!_acceptedTerms) {
-      _showAwesomeSnackbar(
-        title: 'Terms Required',
-        message: 'Please accept terms and conditions to continue',
-        contentType: ContentType.warning,
-      );
-      return;
-    }
-    
+    // BYPASS: Go directly to OTP without validation
     setState(() => _loading = true);
-    
-    try {
-      // Simulate registration process
-      await Future.delayed(const Duration(seconds: 2));
-      
-      if (!mounted) return;
-      
-      _showAwesomeSnackbar(
-        title: 'Success!',
-        message: 'Account created successfully',
-        contentType: ContentType.success,
-      );
-      
-      // Navigate to OTP screen after a short delay
-      await Future.delayed(const Duration(milliseconds: 1500));
-      if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(AppRoutes.otp);
-      
-    } catch (e) {
-      _showAwesomeSnackbar(
-        title: 'Error',
-        message: 'Failed to create account. Please try again.',
-        contentType: ContentType.failure,
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _loading = false);
-      }
-    }
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
+    setState(() => _loading = false);
+    Navigator.of(context).pushReplacementNamed(AppRoutes.otp);
   }
 
   // Check if form is filled to show next components
@@ -314,51 +272,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                       const SizedBox(height: 20),
 
-                      // Register button - always visible with minimal opacity change
+                      // Register button - BYPASSED, always works
                       SizedBox(
                         width: double.infinity,
                         height: 50,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            gradient: canSubmit
-                                ? const LinearGradient(
-                                    colors: [Color(0xFF4DA6FF), Color(0xFF1D64D9)],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  )
-                                : LinearGradient(
-                                    colors: [
-                                      const Color(0xFF4DA6FF).withOpacity(0.7), // Less transparent
-                                      const Color(0xFF1D64D9).withOpacity(0.7), // Less transparent
-                                    ],
-                                  ),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF4DA6FF), Color(0xFF1D64D9)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
                             borderRadius: BorderRadius.circular(100),
                             boxShadow: [
-                              if (canSubmit)
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.25),
-                                  blurRadius: 15,
-                                  offset: const Offset(0, 8),
-                                ),
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                blurRadius: 15,
+                                offset: const Offset(0, 8),
+                              ),
                             ],
                           ),
                           child: GFButton(
-                            onPressed: canSubmit ? _submit : () {
-                              // Show helpful message when button is disabled
-                              if (!_isFormFilled) {
-                                _showAwesomeSnackbar(
-                                  title: 'Form Incomplete',
-                                  message: 'Please fill all fields first',
-                                  contentType: ContentType.help,
-                                );
-                              } else if (!_acceptedTerms) {
-                                _showAwesomeSnackbar(
-                                  title: 'Terms Required',
-                                  message: 'Please accept terms and conditions',
-                                  contentType: ContentType.help,
-                                );
-                              }
-                            },
+                            onPressed: _loading ? null : _submit,
                             size: GFSize.LARGE,
                             color: Colors.transparent,
                             elevation: 0,
