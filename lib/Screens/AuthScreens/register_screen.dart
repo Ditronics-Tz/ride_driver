@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_validator/form_validator.dart';
-import '../../routes/route.dart'; // <--- add this line if not already present
+import '../../routes/route.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,13 +15,13 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
-  final _contactCtrl = TextEditingController(); // phone or email
+  final _contactCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
 
   bool _obscurePass = true;
   bool _obscureConfirm = true;
-  final bool _loading = false;
+  bool _loading = false;
   bool _acceptedTerms = false;
 
   @override
@@ -33,17 +33,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  void _toggleTerms() => setState(() => _acceptedTerms = !_acceptedTerms);
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    
+    setState(() => _loading = true);
+    // Simulate registration process
+    await Future.delayed(const Duration(seconds: 2));
+    setState(() => _loading = false);
+    
+    if (!mounted) return;
+    
+    // Navigate to OTP screen
+    Navigator.of(context).pushReplacementNamed(AppRoutes.otp);
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    // ---------- TUNING ----------
     final double carHeightFactor = 0.55;
     final double carBottomOvershoot = 0.0;
     final Color globalOverlayColor = const Color(0xFF0C3C85);
     final double globalOverlayOpacity = 0.55;
     const double pillRadius = 40;
-    // ----------------------------
 
     final canSubmit = !_loading && _acceptedTerms;
 
@@ -51,7 +65,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: Stack(
         children: [
           // Background gradient
-            Positioned.fill(
+          Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -315,7 +329,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       child: GFButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
+                          Navigator.of(context).pushReplacementNamed(AppRoutes.otp);
                         },
                         size: GFSize.LARGE,
                         color: Colors.transparent,
@@ -337,7 +351,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   const SizedBox(height: 18),
 
-                  // Social row (reuse)
+                  // Social row
                   const _SocialLoginRow(),
 
                   // Already have account link
@@ -385,50 +399,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-
-  void _toggleTerms() => setState(() => _acceptedTerms = !_acceptedTerms);
-
-  Future<void> _submit() async {
-    // TEMP: Bypass registration form for testing – go straight to onboarding.
-    Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
-    return;
-
-    /*
-    // Original logic (restore when done testing)
-    if (!_formKey.currentState!.validate()) return;
-    if (!_acceptedTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Please accept the terms first',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-          ),
-          backgroundColor: Colors.black87,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-    setState(() => _loading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    if (!mounted) return;
-    setState(() => _loading = false);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Account created (placeholder)',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: const Color(0xFF123A91),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    */
-  }
 }
-
-/* ------------------ FORM WIDGET ------------------ */
 
 class _RegisterForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -457,7 +428,7 @@ class _RegisterForm extends StatelessWidget {
 
   bool _isValidEmail(String v) {
     final emailRegex =
-        RegExp(r'^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$');
+        RegExp(r'^[A-Za-z0-9._%+\-]+@[A-ZaZ0-9.\-]+\.[A-Za-z]{2,}$');
     return emailRegex.hasMatch(v);
   }
 
@@ -550,7 +521,7 @@ class _RegisterForm extends StatelessWidget {
               label: 'Full name',
               icon: CupertinoIcons.person_crop_circle,
             ),
-            validator: (v) => nameValidator(v),
+            validator: nameValidator,
           ),
           const SizedBox(height: 18),
           TextFormField(
@@ -582,7 +553,7 @@ class _RegisterForm extends StatelessWidget {
                 onPressed: onTogglePass,
               ),
             ),
-            validator: (v) => passwordValidator(v),
+            validator: passwordValidator,
           ),
           const SizedBox(height: 18),
           TextFormField(
@@ -609,8 +580,6 @@ class _RegisterForm extends StatelessWidget {
     );
   }
 }
-
-/* ------------------ SHARED BRAND + SOCIAL (duplicated for now) ------------------ */
 
 class _BrandHeader extends StatelessWidget {
   final bool showTagline;
@@ -712,9 +681,6 @@ class _SocialLoginRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.findAncestorStateOfType<_RegisterScreenState>();
-    final bool disabled = state?._loading ?? false;
-
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
       child: SizedBox(
@@ -753,9 +719,6 @@ class _SocialButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final registerState = context.findAncestorStateOfType<_RegisterScreenState>();
-    final bool disabled = registerState?._loading ?? false;
-
     late final Widget icon;
     late final Color fg;
     late final List<Color> gradient;
@@ -802,65 +765,59 @@ class _SocialButton extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: disabled
-          ? null
-          : () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    '$label login coming soon',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-                  ),
-                  backgroundColor: const Color(0xFF123A91),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 180),
-        opacity: disabled ? 0.55 : 1,
-        child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: gradient,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '$label login coming soon',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
             ),
-            borderRadius: BorderRadius.circular(100),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.22),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.18),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
+            backgroundColor: const Color(0xFF123A91),
+            behavior: SnackBarBehavior.floating,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              icon,
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.poppins(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.1,
-                    color: fg,
-                  ),
+        );
+      },
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: gradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.22),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.18),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.1,
+                  color: fg,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

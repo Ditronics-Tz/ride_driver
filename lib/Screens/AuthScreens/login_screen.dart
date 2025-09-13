@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_validator/form_validator.dart';
-import '/../routes/route.dart';  
+import '../../routes/route.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -92,46 +92,43 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Content
+          // Content - Fixed layout without scrolling
           SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: size.height * 0.06,
-                bottom: 40,
-              ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
+                  const SizedBox(height: 20),
+                  
                   const _BrandHeader(
                     showTagline: false,
-                    titleSize: 38,
-                    iconSize: 60,
-                    circleSize: 72,
+                    titleSize: 32,
+                    iconSize: 50,
+                    circleSize: 60,
                   ),
-                  const SizedBox(height: 34),
+                  const SizedBox(height: 20),
 
                   Text(
                     'Welcome back',
                     style: GoogleFonts.poppins(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: Colors.white.withOpacity(0.97),
                       letterSpacing: -0.2,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
                     'Sign in to continue driving & earning',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w400,
                       color: Colors.white.withOpacity(0.82),
                       letterSpacing: 0.2,
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 24),
 
                   _LoginForm(
                     formKey: _formKey,
@@ -141,11 +138,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     onToggleObscure: () => setState(() => _obscure = !_obscure),
                   ),
 
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 20),
 
                   SizedBox(
                     width: double.infinity,
-                    height: 56,
+                    height: 50,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
@@ -173,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         fullWidthButton: true,
                         shape: GFButtonShape.pills,
                         textStyle: GoogleFonts.poppins(
-                          fontSize: 17,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.2,
                         ),
@@ -205,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 8),
                   GFButton(
                     onPressed: _loading ? null : _forgotPassword,
                     type: GFButtonType.transparent,
@@ -213,40 +210,41 @@ class _LoginScreenState extends State<LoginScreen> {
                     textStyle: GoogleFonts.poppins(
                       color: Colors.white.withOpacity(0.9),
                       fontWeight: FontWeight.w500,
+                      fontSize: 13,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  
+                  const Spacer(),
 
                   const _SocialLoginRow(),
+                  const SizedBox(height: 12),
 
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(AppRoutes.register);
-                      },
-                      child: RichText(
-                        text: TextSpan(
-                          style: GoogleFonts.poppins(
-                            color: Colors.white.withOpacity(0.78),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.2,
-                          ),
-                          children: [
-                            const TextSpan(text: "Don't have an account? "),
-                            TextSpan(
-                              text: 'Register',
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xFF8CCBFF),
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(AppRoutes.register);
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        style: GoogleFonts.poppins(
+                          color: Colors.white.withOpacity(0.78),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.2,
                         ),
+                        children: [
+                          const TextSpan(text: "Don't have an account? "),
+                          TextSpan(
+                            text: 'Register',
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF8CCBFF),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -280,16 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
     setState(() => _loading = false);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Logged in (placeholder)',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-        ),
-        backgroundColor: const Color(0xFF123A91),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    Navigator.of(context).pushReplacementNamed(AppRoutes.mainNavigation);
   }
 
   void _forgotPassword() {
@@ -394,7 +383,7 @@ class _LoginForm extends StatelessWidget {
             ),
             validator: phoneOrEmailValidator,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           TextFormField(
             controller: passwordCtrl,
             obscureText: obscure,
@@ -416,7 +405,7 @@ class _LoginForm extends StatelessWidget {
                 onPressed: onToggleObscure,
               ),
             ),
-            validator: (v) => passwordValidator(v),
+            validator: passwordValidator,
           ),
         ],
       ),
@@ -462,7 +451,7 @@ class _LoginForm extends StatelessWidget {
         borderRadius: BorderRadius.circular(pillRadius),
         borderSide: const BorderSide(color: Colors.redAccent, width: 1.2),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
     );
   }
 }
@@ -514,10 +503,10 @@ class _BrandHeader extends StatelessWidget {
             size: iconSize,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _GradientText(
           'RideApp',
-            style: titleStyle,
+          style: titleStyle,
           gradient: const LinearGradient(
             colors: [Colors.white, Color(0xFF8CCBFF)],
             begin: Alignment.topLeft,
@@ -525,12 +514,12 @@ class _BrandHeader extends StatelessWidget {
           ),
         ),
         if (showTagline) ...[
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             'Join us to start earning',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Colors.white.withOpacity(0.92),
               letterSpacing: 0.25,
@@ -567,27 +556,24 @@ class _SocialLoginRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 0, bottom: 6),
-      child: SizedBox(
-        height: 56,
-        child: Row(
-          children: const [
-            Expanded(
-              child: _SocialButton(
-                type: _SocialType.google,
-                label: 'Google',
-              ),
+    return SizedBox(
+      height: 48,
+      child: Row(
+        children: const [
+          Expanded(
+            child: _SocialButton(
+              type: _SocialType.google,
+              label: 'Google',
             ),
-            SizedBox(width: 14),
-            Expanded(
-              child: _SocialButton(
-                type: _SocialType.apple,
-                label: 'Apple',
-              ),
+          ),
+          SizedBox(width: 14),
+          Expanded(
+            child: _SocialButton(
+              type: _SocialType.apple,
+              label: 'Apple',
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -615,8 +601,8 @@ class _SocialButton extends StatelessWidget {
     switch (type) {
       case _SocialType.google:
         icon = Container(
-          width: 26,
-          height: 26,
+          width: 22,
+          height: 22,
           decoration: BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
@@ -626,7 +612,7 @@ class _SocialButton extends StatelessWidget {
           child: Text(
             'G',
             style: GoogleFonts.poppins(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.w700,
               color: const Color(0xFF4285F4),
               letterSpacing: -0.4,
@@ -643,7 +629,7 @@ class _SocialButton extends StatelessWidget {
         icon = const Icon(
           Icons.apple,
           color: Colors.white,
-          size: 26,
+          size: 22,
         );
         gradient = [
           Colors.white.withOpacity(0.14),
@@ -687,19 +673,19 @@ class _SocialButton extends StatelessWidget {
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 18),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               icon,
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Flexible(
                 child: Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.15,
                     color: fg,

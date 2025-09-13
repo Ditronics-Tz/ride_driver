@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import '../Screens/welcome.dart';
 import '../Screens/AuthScreens/login_screen.dart';
 import '../Screens/AuthScreens/register_screen.dart';
-import '../Screens/AuthScreens/onboarding.dart';
+import '../Screens/AuthScreens/otp.dart';
 import '../Screens/DriverScreens/main_navigation.dart';
 
 class AppRoutes {
   static const String welcome = '/welcome';
   static const String login = '/login';
   static const String register = '/register';
-  static const String onboarding = '/onboarding';
+  static const String otp = '/otp';
   static const String mainNavigation = '/main';
   static const String home = '/home';
   static const String profile = '/profile';
@@ -20,7 +20,7 @@ class AppRoutes {
     welcome: (context) => const WelcomeScreen(),
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
-    onboarding: (context) => const OnboardingScreen(),
+    otp: (context) => const OtpScreen(),
     mainNavigation: (context) => const MainNavigationScreen(),
   };
 
@@ -32,8 +32,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
-      case onboarding:
-        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
+      case otp:
+        return MaterialPageRoute(builder: (_) => const OtpScreen());
       case mainNavigation:
         return MaterialPageRoute(builder: (_) => const MainNavigationScreen());
       default:
