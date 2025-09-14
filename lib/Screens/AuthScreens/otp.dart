@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:getwidget/getwidget.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneMasked; // e.g. "+255 ....."
@@ -148,149 +149,189 @@ class _OtpScreenState extends State<OtpScreen> {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF2563EB),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: bottomInset + 16),
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Center(
-            child: Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE9F2FF),
-                borderRadius: BorderRadius.circular(26),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _TopBrandHeader(textBuilder: gText),
-                  const SizedBox(height: 30),
-                  _buildOtpTitle(),
-                  const SizedBox(height: 12),
-                  Text(
-                    'We have sent an OTP on a given Number\n${widget.phoneMasked}',
-                    style: gText(
-                      16,
-                      FontWeight.w500,
-                      color: const Color(0xFF1C2A3A),
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  Text(
-                    'Enter OTP code',
-                    style: gText(
-                      15.5,
-                      FontWeight.w600,
-                      color: const Color(0xFF1C2A3A),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: List.generate(_otpLength, (i) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          right: i == _otpLength - 1 ? 0 : 12,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF2563EB),
+              Color(0xFF1D4ED8),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: bottomInset + 16),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Center(
+              child: ClipRRect( // Force rounded corners on all children
+                borderRadius: BorderRadius.circular(28),
+                child: GFCard(
+                  margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding: const EdgeInsets.all(24), // Use consistent padding
+                  borderRadius: BorderRadius.circular(28),
+                  color: const Color(0xFFF0F5FF),
+                  elevation: 10,
+                  boxFit: BoxFit.cover,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _TopBrandHeader(textBuilder: gText),
+                      const SizedBox(height: 30),
+                      _buildOtpTitle(),
+                      const SizedBox(height: 12),
+                      Text(
+                        'We have sent an OTP on a given Number\n${widget.phoneMasked}',
+                        style: gText(
+                          15,
+                          FontWeight.w500,
+                          color: const Color(0xFF1C2A3A),
+                          height: 1.4,
                         ),
-                        child: _OtpBox(
-                          controller: _controllers[i],
-                          focusNode: _focusNodes[i],
-                          onChanged: (v) => _onChanged(i, v),
-                          onKey: (e) => _onKey(e, i),
-                          textBuilder: gText,
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 20),
-                  RichText(
-                    text: TextSpan(
-                      style: gText(
-                        15,
-                        FontWeight.w500,
-                        color: const Color(0xFF1C2A3A),
                       ),
-                      children: [
-                        const TextSpan(text: "Don't receive an OTP? "),
-                        WidgetSpan(
-                          alignment: PlaceholderAlignment.baseline,
-                          baseline: TextBaseline.alphabetic,
-                          child: GestureDetector(
-                            onTap: _resend,
+                      const SizedBox(height: 28),
+                      Text(
+                        'Enter OTP code',
+                        style: gText(
+                          15.5,
+                          FontWeight.w600,
+                          color: const Color(0xFF1C2A3A),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(_otpLength, (i) {
+                          return _OtpBox(
+                            controller: _controllers[i],
+                            focusNode: _focusNodes[i],
+                            onChanged: (v) => _onChanged(i, v),
+                            onKey: (e) => _onKey(e, i),
+                            textBuilder: gText,
+                          );
+                        }),
+                      ),
+                      const SizedBox(height: 20),
+                      RichText(
+                        text: TextSpan(
+                          style: gText(
+                            15,
+                            FontWeight.w500,
+                            color: const Color(0xFF1C2A3A),
+                          ),
+                          children: [
+                            const TextSpan(text: "Don't receive an OTP? "),
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.baseline,
+                              baseline: TextBaseline.alphabetic,
+                              child: GestureDetector(
+                                onTap: _resend,
+                                child: Text(
+                                  _secondsLeft > 0
+                                      ? 'Resend (${_secondsLeft}s)'
+                                      : 'Resend',
+                                  style: gText(
+                                    15,
+                                    FontWeight.w600,
+                                    color: const Color(0xFF1D64D9),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: GFButton(
+                          onPressed: _isComplete && !_submitting ? _submit : null,
+                          size: GFSize.LARGE,
+                          color: const Color(0xFF2566D3),
+                          elevation: _isComplete ? 6 : 2,
+                          shape: GFButtonShape.pills,
+                          fullWidthButton: true,
+                          textStyle: gText(18, FontWeight.w600),
+                          child: _submitting
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const GFLoader(
+                                      type: GFLoaderType.circle,
+                                      size: GFSize.SMALL,
+                                      loaderColorOne: Colors.white,
+                                    ),
+                                    const SizedBox(width: 14),
+                                    Text(
+                                      'Verifying...',
+                                      style: gText(17, FontWeight.w600, color: Colors.white),
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Continue',
+                                      style: gText(18, FontWeight.w600, color: Colors.white),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      CupertinoIcons.arrow_right,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 32), // Spacing before footer
+                      // --- Footer content moved here ---
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const GFAvatar(
+                            backgroundColor: Color(0xFF1D64D9),
+                            radius: 8,
+                            child: Icon(Icons.star, size: 10, color: Colors.white),
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible( // Keep Flexible to handle smaller screens
                             child: Text(
-                              _secondsLeft > 0
-                                  ? 'Resend (${_secondsLeft}s)'
-                                  : 'Resend',
+                              'Your trusted ride partner',
+                              textAlign: TextAlign.center,
                               style: gText(
                                 15,
-                                FontWeight.w600,
-                                color: const Color(0xFF1D64D9),
+                                FontWeight.w700,
+                                color: const Color(0xFF1C2A3A),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2566D3),
-                        foregroundColor: Colors.white,
-                        elevation: _isComplete ? 3 : 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        textStyle: gText(18, FontWeight.w600),
+                          const SizedBox(width: 8),
+                          const GFAvatar(
+                            backgroundColor: Color(0xFF1D64D9),
+                            radius: 8,
+                            child: Icon(Icons.star, size: 10, color: Colors.white),
+                          ),
+                        ],
                       ),
-                      onPressed: _isComplete && !_submitting ? _submit : null,
-                      child: _submitting
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.4,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
-                                Text(
-                                  'Verifying...',
-                                  style: gText(17, FontWeight.w600),
-                                ),
-                              ],
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Continue',
-                                  style: gText(18, FontWeight.w600),
-                                ),
-                                const SizedBox(width: 8),
-                                const Icon(
-                                  CupertinoIcons.arrow_right,
-                                  size: 20,
-                                ),
-                              ],
-                            ),
-                    ),
+                      const SizedBox(height: 4),
+                      Center(
+                        child: Text(
+                          'Trusted by Thousands of Drivers',
+                          style: gText(
+                            14,
+                            FontWeight.w500,
+                            color: const Color(0xFF1C2A3A).withOpacity(0.85),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 18),
-                  _BottomFooter(height: size.height * 0.16, textBuilder: gText),
-                ],
+                ),
               ),
             ),
           ),
@@ -341,64 +382,108 @@ class _OtpBox extends StatefulWidget {
   State<_OtpBox> createState() => _OtpBoxState();
 }
 
-class _OtpBoxState extends State<_OtpBox> {
+class _OtpBoxState extends State<_OtpBox> with SingleTickerProviderStateMixin {
   late final FocusNode _keyboardFocusNode;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
     _keyboardFocusNode = FocusNode(debugLabel: '_OtpBox RawKeyboardListener');
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    widget.focusNode.addListener(() {
+      if (widget.focusNode.hasFocus) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    });
   }
 
   @override
   void dispose() {
     _keyboardFocusNode.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final borderColor = const Color(0xFF1D64D9);
-    return SizedBox(
-      width: 52,
-      height: 52,
-      child: RawKeyboardListener(
-        focusNode: _keyboardFocusNode,
-        onKey: widget.onKey,
-        child: TextField(
-          controller: widget.controller,
-          focusNode: widget.focusNode,
-          textAlign: TextAlign.center,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          textInputAction: TextInputAction.next,
-          maxLength: 1,
-          style: widget.textBuilder(
-            24,
-            FontWeight.w700,
-            color: const Color(0xFF0E2033),
-          ),
-          cursorColor: borderColor,
-          decoration: InputDecoration(
-            counterText: '',
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.zero,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: borderColor.withOpacity(0.55),
-                width: 1.2,
+    final hasValue = widget.controller.text.isNotEmpty;
+    
+    // Make the box size responsive
+    final screenWidth = MediaQuery.of(context).size.width;
+    final boxSize = (screenWidth - 48 - 48 - (12 * 3)) / 4; // Paddings and spacing
+
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Container(
+            width: boxSize,
+            height: boxSize,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16), // Smoother radius
+              color: Colors.white,
+              border: Border.all(
+                color: widget.focusNode.hasFocus
+                    ? borderColor
+                    : hasValue
+                        ? borderColor.withOpacity(0.7)
+                        : borderColor.withOpacity(0.3),
+                width: widget.focusNode.hasFocus ? 2.0 : 1.5,
+              ),
+              boxShadow: [
+                if (widget.focusNode.hasFocus || hasValue)
+                  BoxShadow(
+                    color: borderColor.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+              ],
+            ),
+              child: RawKeyboardListener(
+                focusNode: _keyboardFocusNode,
+                onKey: widget.onKey,
+                child: TextField(
+                  controller: widget.controller,
+                  focusNode: widget.focusNode,
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  textInputAction: TextInputAction.next,
+                  maxLength: 1,
+                  style: widget.textBuilder(
+                    28,
+                    FontWeight.w700,
+                    color: const Color(0xFF0E2033),
+                  ),
+                  cursorColor: borderColor,
+                  decoration: const InputDecoration(
+                    counterText: '',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onChanged: widget.onChanged,
+                ),
               ),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: borderColor, width: 1.6),
-            ),
-          ),
-          onChanged: widget.onChanged,
-        ),
-      ),
+          );
+      },
     );
   }
 }
@@ -455,78 +540,30 @@ class _TopBrandHeader extends StatelessWidget {
             ],
           ),
         ),
-        Column(
-          children: [
-            const Icon(
-              CupertinoIcons.car_detailed,
-              size: 30,
-              color: Color(0xFF1D64D9),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Ride',
-              style: textBuilder(
-                14.5,
-                FontWeight.w600,
-                color: const Color(0xFF1D64D9),
+        GFAvatar(
+          backgroundColor: const Color(0xFF1D64D9).withOpacity(0.1),
+          radius: 25,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                CupertinoIcons.car_detailed,
+                size: 24,
+                color: Color(0xFF1D64D9),
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                'Ride',
+                style: textBuilder(
+                  10,
+                  FontWeight.w600,
+                  color: const Color(0xFF1D64D9),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
-    );
-  }
-}
-
-class _BottomFooter extends StatelessWidget {
-  final double height;
-  final TextStyle Function(
-    double,
-    FontWeight, {
-    Color? color,
-    double? letterSpacing,
-    double? height,
-  })
-  textBuilder;
-
-  const _BottomFooter({required this.height, required this.textBuilder});
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(26),
-        bottomRight: Radius.circular(26),
-      ),
-      child: Container(
-        width: double.infinity,
-        height: height,
-        color: Colors.white,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.only(bottom: 18),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              'Your trusted ride partner',
-              style: textBuilder(
-                15,
-                FontWeight.w700,
-                color: const Color(0xFF1C2A3A),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Trusted by Thousands of Drivers',
-              style: textBuilder(
-                14,
-                FontWeight.w500,
-                color: const Color(0xFF1C2A3A).withOpacity(0.85),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

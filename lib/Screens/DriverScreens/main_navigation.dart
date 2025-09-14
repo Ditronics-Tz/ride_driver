@@ -185,7 +185,7 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
                     Navigator.of(context).pop();
                   },
                 );
-              }).toList(),
+              }),
 
               const Divider(),
 
