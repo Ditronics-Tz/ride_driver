@@ -3,7 +3,6 @@ import '../Screens/welcome.dart';
 import '../Screens/AuthScreens/login_screen.dart';
 import '../Screens/AuthScreens/register_screen.dart';
 import '../Screens/AuthScreens/otp.dart';
-import '../Screens/DriverScreens/main_navigation.dart';
 
 class AppRoutes {
   static const String welcome = '/welcome';
@@ -21,7 +20,6 @@ class AppRoutes {
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     otp: (context) => const OtpScreen(),
-    mainNavigation: (context) => const MainNavigationScreen(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -34,8 +32,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case otp:
         return MaterialPageRoute(builder: (_) => const OtpScreen());
-      case mainNavigation:
-        return MaterialPageRoute(builder: (_) => const MainNavigationScreen());
+      
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
