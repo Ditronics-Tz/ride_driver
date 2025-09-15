@@ -124,8 +124,10 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
     );
 
-    // Navigate to main navigation
-    Navigator.of(context).pushReplacementNamed('/main');
+    // Navigate to home screen
+    Navigator.of(
+      context,
+    ).pushReplacementNamed('/home'); // Changed from '/main' to '/home'
   }
 
   void _resend() {
