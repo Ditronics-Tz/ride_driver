@@ -100,10 +100,7 @@ class _MapAttribution extends StatelessWidget {
         color: Colors.white.withOpacity(0.8),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: const Text(
-        '© CartoDB, © OpenStreetMap',
-        style: TextStyle(fontSize: 10, color: Colors.black54),
-      ),
+      child: const SizedBox.shrink(),
     );
   }
 }
@@ -230,22 +227,46 @@ class _AnimatedMarker extends StatelessWidget {
           curve: Curves.easeInOut,
         ),
       ],
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withOpacity(0.8),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              spreadRadius: 2,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Outer pulse circle
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xFF4A90E2).withOpacity(0.2),
+              shape: BoxShape.circle,
             ),
-          ],
-        ),
-        child: const Icon(Icons.my_location, color: Colors.white, size: 20),
+          ),
+          // Middle pulse circle
+          Container(
+            width: 45,
+            height: 45,
+            decoration: BoxDecoration(
+              color: const Color(0xFF4A90E2).withOpacity(0.4),
+              shape: BoxShape.circle,
+            ),
+          ),
+          // Main marker circle
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: const Color(0xFF4A90E2),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+            child: const Icon(Icons.location_on, color: Colors.white, size: 18),
+          ),
+        ],
       ),
     ).animate().fadeIn().then().scale();
   }
