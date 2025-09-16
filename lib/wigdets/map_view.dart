@@ -46,13 +46,15 @@ class _MapViewState extends ConsumerState<MapView>
               mapController: _mapController,
               options: MapOptions(
                 initialCenter: location,
-                initialZoom: 15.0,
+                initialZoom: 18.0, // Increased initial zoom level
                 minZoom: 3.0,
-                maxZoom: 18.0,
+                maxZoom: 20.0, // Increased max zoom level
               ),
               children: [
                 TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  urlTemplate:
+                      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                  subdomains: const ['a', 'b', 'c', 'd'],
                   userAgentPackageName: 'com.example.ride_driver',
                 ),
                 MarkerLayer(
@@ -71,7 +73,10 @@ class _MapViewState extends ConsumerState<MapView>
             onPressed: () {
               final location = ref.read(currentLocationProvider).value;
               if (location != null) {
-                _mapController.move(location, 15.0);
+                _mapController.move(
+                  location,
+                  19.0,
+                ); // Increased zoom level for recenter
               }
             },
             backgroundColor: Theme.of(context).primaryColor,
@@ -96,24 +101,25 @@ class _MapAttribution extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: const Text(
-        '',
+        '© CartoDB, © OpenStreetMap',
         style: TextStyle(fontSize: 10, color: Colors.black54),
       ),
     );
   }
 }
 
-// Custom loading overlay
+// Custom loading overlay with blue background
 class _LoadingOverlay extends StatelessWidget {
   const _LoadingOverlay();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withOpacity(0.5),
+      color: const Color(0xFF4A90E2), // Changed to blue background
       child: Center(
         child: Card(
           elevation: 8,
+          color: Colors.white, // White card on blue background
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -124,13 +130,15 @@ class _LoadingOverlay extends StatelessWidget {
               children: [
                 CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).primaryColor,
+                    const Color(0xFF4A90E2), // Blue progress indicator
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'Getting your location...',
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: const Color(0xFF4A90E2), // Blue text
+                  ),
                 ),
               ],
             ),
