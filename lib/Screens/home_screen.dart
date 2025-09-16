@@ -15,9 +15,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Widget> _screens = [
-    const MapView(), // Home tab shows the map
-    const Center(child: Text('Profile Screen')), // Placeholder for profile
-    const Center(child: Text('History Screen')), // Placeholder for history
+    const MapView(), // Index 0: Home
+    const Center(child: Text('History Screen')), // Index 1: History
+    const Center(child: Text('Profile Screen')), // Index 2: Profile
   ];
 
   void _onTabTapped(int index) {
@@ -30,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      // Remove the AppBar completely
       body: Stack(
         children: [
           // Main content
@@ -38,9 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // Floating hamburger menu button
           Positioned(
-            top:
-                MediaQuery.of(context).padding.top +
-                16, // Account for status bar
+            top: MediaQuery.of(context).padding.top + 16,
             left: 16,
             child: FloatingActionButton.small(
               onPressed: () {
@@ -110,22 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               onTap: () {
                 Navigator.pop(context);
-                _onTabTapped(0);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.person, color: AppColors.primaryBlue),
-              title: Text(
-                'Profile',
-                style: AppTextStyles.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                _onTabTapped(1);
+                _onTabTapped(0); // Home = index 0
               },
             ),
             ListTile(
@@ -140,7 +122,22 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               onTap: () {
                 Navigator.pop(context);
-                _onTabTapped(2);
+                _onTabTapped(1); // History = index 1
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.person, color: AppColors.primaryBlue),
+              title: Text(
+                'Profile',
+                style: AppTextStyles.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _onTabTapped(2); // Profile = index 2
               },
             ),
             const Divider(),
