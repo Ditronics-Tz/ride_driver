@@ -7,13 +7,32 @@ import 'package:permission_handler/permission_handler.dart';
 // Simple location provider
 final currentLocationProvider = FutureProvider<LatLng?>((ref) async {
   try {
-    final permission = await Permission.location.request();
-    if (!permission.isGranted) {
-      throw Exception('Location permission denied');
+    // Check if location services are enabled
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('Location services are disabled');
     }
 
+    // Check permission status first
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    // If permission is denied, request it
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Location permission denied');
+      }
+    }
+
+    // If permission is permanently denied
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception('Location permissions are permanently denied');
+    }
+
+    // Get current position
     final position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
+      timeLimit: const Duration(seconds: 10), // Add timeout
     );
 
     return LatLng(position.latitude, position.longitude);
@@ -43,8 +62,13 @@ final currentAddressProvider = FutureProvider<String?>((ref) async {
   return null;
 });
 
-// Permission status provider
+// Permission status provider using Geolocator instead of permission_handler
 final locationPermissionProvider = FutureProvider<bool>((ref) async {
-  final permission = await Permission.location.status;
-  return permission.isGranted;
+  try {
+    LocationPermission permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
+  } catch (e) {
+    return false;
+  }
 });

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:getwidget/getwidget.dart';
+import '../../core/theme.dart'; // Add this import
 
 class OtpScreen extends StatefulWidget {
   final String phoneMasked; // e.g. "+255 ....."
@@ -119,15 +120,13 @@ class _OtpScreenState extends State<OtpScreen> {
           'OTP $_enteredCode verified (placeholder)',
           style: gText(17, FontWeight.w600, color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF123A91),
+        backgroundColor: AppColors.primaryBlueDarker, // Use theme color
         behavior: SnackBarBehavior.floating,
       ),
     );
 
     // Navigate to home screen
-    Navigator.of(
-      context,
-    ).pushReplacementNamed('/home'); // Changed from '/main' to '/home'
+    Navigator.of(context).pushReplacementNamed('/home');
   }
 
   void _resend() {
@@ -138,7 +137,7 @@ class _OtpScreenState extends State<OtpScreen> {
           'OTP resent (placeholder)',
           style: gText(16, FontWeight.w500, color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF123A91),
+        backgroundColor: AppColors.primaryBlueDarker, // Use theme color
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -154,11 +153,7 @@ class _OtpScreenState extends State<OtpScreen> {
       body: Container(
         height: size.height,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-          ),
+          gradient: AppColors.primaryGradient, // Use theme gradient
         ),
         child: SafeArea(
           child: SingleChildScrollView(
@@ -170,9 +165,9 @@ class _OtpScreenState extends State<OtpScreen> {
                   horizontal: 14,
                   vertical: 12,
                 ),
-                padding: const EdgeInsets.all(24), // Use consistent padding
+                padding: const EdgeInsets.all(24),
                 borderRadius: BorderRadius.circular(32),
-                color: const Color(0xFFF0F5FF),
+                color: AppColors.backgroundLight, // Use theme color
                 elevation: 10,
                 boxFit: BoxFit.cover,
                 content: Column(
@@ -188,7 +183,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       style: gText(
                         15,
                         FontWeight.w500,
-                        color: const Color(0xFF1C2A3A),
+                        color: AppColors.textPrimary, // Use theme color
                         height: 1.4,
                       ),
                     ),
@@ -198,7 +193,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       style: gText(
                         15.5,
                         FontWeight.w600,
-                        color: const Color(0xFF1C2A3A),
+                        color: AppColors.textPrimary, // Use theme color
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -220,7 +215,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         style: gText(
                           15,
                           FontWeight.w500,
-                          color: const Color(0xFF1C2A3A),
+                          color: AppColors.textPrimary, // Use theme color
                         ),
                         children: [
                           const TextSpan(text: "Don't receive an OTP? "),
@@ -236,7 +231,8 @@ class _OtpScreenState extends State<OtpScreen> {
                                 style: gText(
                                   15,
                                   FontWeight.w600,
-                                  color: const Color(0xFF1D64D9),
+                                  color:
+                                      AppColors.primaryBlue, // Use theme color
                                 ),
                               ),
                             ),
@@ -251,7 +247,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       child: GFButton(
                         onPressed: _isComplete && !_submitting ? _submit : null,
                         size: GFSize.LARGE,
-                        color: const Color(0xFF2566D3),
+                        color: AppColors.primaryBlue, // Use theme color
                         elevation: _isComplete ? 6 : 2,
                         shape: GFButtonShape.pills,
                         fullWidthButton: true,
@@ -297,15 +293,15 @@ class _OtpScreenState extends State<OtpScreen> {
                               ),
                       ),
                     ),
-                    const SizedBox(height: 32), // Spacing before footer
-                    // --- Footer content moved here ---
+                    const SizedBox(height: 32),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const GFAvatar(
-                          backgroundColor: Color(0xFF1D64D9),
+                        GFAvatar(
+                          backgroundColor:
+                              AppColors.primaryBlue, // Use theme color
                           radius: 8,
-                          child: Icon(
+                          child: const Icon(
                             Icons.star,
                             size: 10,
                             color: Colors.white,
@@ -313,22 +309,22 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                         const SizedBox(width: 8),
                         Flexible(
-                          // Keep Flexible to handle smaller screens
                           child: Text(
                             'Your trusted ride partner',
                             textAlign: TextAlign.center,
                             style: gText(
                               15,
                               FontWeight.w700,
-                              color: const Color(0xFF1C2A3A),
+                              color: AppColors.textPrimary, // Use theme color
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const GFAvatar(
-                          backgroundColor: Color(0xFF1D64D9),
+                        GFAvatar(
+                          backgroundColor:
+                              AppColors.primaryBlue, // Use theme color
                           radius: 8,
-                          child: Icon(
+                          child: const Icon(
                             Icons.star,
                             size: 10,
                             color: Colors.white,
@@ -343,7 +339,9 @@ class _OtpScreenState extends State<OtpScreen> {
                         style: gText(
                           14,
                           FontWeight.w500,
-                          color: const Color(0xFF1C2A3A).withOpacity(0.85),
+                          color: AppColors.textPrimary.withOpacity(
+                            0.85,
+                          ), // Use theme color
                         ),
                       ),
                     ),
@@ -358,13 +356,19 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   Widget _buildOtpTitle() {
-    final title = gText(28, FontWeight.w700, color: const Color(0xFF1C2A3A));
+    final title = gText(
+      28,
+      FontWeight.w700,
+      color: AppColors.textPrimary,
+    ); // Use theme color
     return RichText(
       text: TextSpan(
         children: [
           TextSpan(
             text: 'OTP',
-            style: title.copyWith(color: const Color(0xFF1D64D9)),
+            style: title.copyWith(
+              color: AppColors.primaryBlue,
+            ), // Use theme color
           ),
           TextSpan(text: ' verification', style: title),
         ],
@@ -441,7 +445,7 @@ class _OtpBoxState extends State<_OtpBox> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = const Color(0xFF1D64D9);
+    final borderColor = AppColors.primaryBlue; // Use theme color
     final hasValue = widget.controller.text.isNotEmpty;
 
     // Make the box size responsive
@@ -491,7 +495,7 @@ class _OtpBoxState extends State<_OtpBox> with SingleTickerProviderStateMixin {
                 style: widget.textBuilder(
                   28,
                   FontWeight.w700,
-                  color: const Color(0xFF0E2033),
+                  color: AppColors.textDark, // Use theme color
                 ),
                 cursorColor: borderColor,
                 decoration: const InputDecoration(
@@ -526,12 +530,12 @@ class _TopBrandHeader extends StatelessWidget {
     final welcomeStyle = textBuilder(
       17.5,
       FontWeight.w600,
-      color: const Color(0xFF0E2033),
+      color: AppColors.textDark, // Use theme color
     );
     final subtitleStyle = textBuilder(
       14,
       FontWeight.w500,
-      color: const Color(0xFF2F3B52),
+      color: AppColors.textSecondary, // Use theme color
       height: 1.25,
     );
 
@@ -550,7 +554,7 @@ class _TopBrandHeader extends StatelessWidget {
                     TextSpan(
                       text: 'Ride',
                       style: welcomeStyle.copyWith(
-                        color: const Color(0xFF1D64D9),
+                        color: AppColors.primaryBlue, // Use theme color
                       ),
                     ),
                   ],
@@ -562,15 +566,17 @@ class _TopBrandHeader extends StatelessWidget {
           ),
         ),
         GFAvatar(
-          backgroundColor: const Color(0xFF1D64D9).withOpacity(0.1),
+          backgroundColor: AppColors.primaryBlue.withOpacity(
+            0.1,
+          ), // Use theme color
           radius: 25,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 CupertinoIcons.car_detailed,
                 size: 24,
-                color: Color(0xFF1D64D9),
+                color: AppColors.primaryBlue, // Use theme color
               ),
               const SizedBox(height: 2),
               Text(
@@ -578,7 +584,7 @@ class _TopBrandHeader extends StatelessWidget {
                 style: textBuilder(
                   10,
                   FontWeight.w600,
-                  color: const Color(0xFF1D64D9),
+                  color: AppColors.primaryBlue, // Use theme color
                 ),
               ),
             ],
