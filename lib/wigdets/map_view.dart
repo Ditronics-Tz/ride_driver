@@ -53,7 +53,7 @@ class _MapViewState extends ConsumerState<MapView>
               children: [
                 TileLayer(
                   urlTemplate:
-                      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                      'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
                   subdomains: const ['a', 'b', 'c', 'd'],
                   userAgentPackageName: 'com.example.ride_driver',
                 ),
