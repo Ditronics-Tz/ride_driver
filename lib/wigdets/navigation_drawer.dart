@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../routes/route.dart'; 
 import '../core/theme.dart';
 
 class AppNavigationDrawer extends StatelessWidget {
@@ -80,7 +81,7 @@ class AppNavigationDrawer extends StatelessWidget {
             ),
             onTap: () {
               Navigator.pop(context);
-              // Add verification navigation
+              Navigator.pushNamed(context, AppRoutes.verification);
             },
           ),
           const Divider(),

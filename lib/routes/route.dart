@@ -3,7 +3,9 @@ import '../Screens/welcome.dart';
 import '../Screens/AuthScreens/login_screen.dart';
 import '../Screens/AuthScreens/register_screen.dart';
 import '../Screens/AuthScreens/otp.dart';
-import '../Screens/home_screen.dart'; // Added import for HomeScreen
+import '../Screens/home_screen.dart';
+import '../Screens/DriverScreens/verification_screen.dart';
+import '../Screens/profile_screen.dart'; // Added profile screen import
 
 class AppRoutes {
   static const String welcome = '/welcome';
@@ -15,13 +17,16 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String rides = '/rides';
   static const String earnings = '/earnings';
+  static const String verification = '/verification';
 
   static Map<String, WidgetBuilder> get routes => {
     welcome: (context) => const WelcomeScreen(),
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     otp: (context) => const OtpScreen(),
-    home: (context) => const HomeScreen(), // Added HomeScreen route
+    home: (context) => const HomeScreen(),
+    profile: (context) => const ProfileScreen(), // Added profile screen
+    verification: (context) => const VerificationScreen(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -34,8 +39,12 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case otp:
         return MaterialPageRoute(builder: (_) => const OtpScreen());
-      case home: // Added case for home
+      case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case profile: // Added profile case
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case verification:
+        return MaterialPageRoute(builder: (_) => const VerificationScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

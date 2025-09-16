@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../core/theme.dart';
+import '../routes/route.dart'; // Added import for AppRoutes
 
 class BottomNav extends StatelessWidget {
   final int currentIndex;
@@ -12,7 +13,21 @@ class BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      onTap: onTap,
+      onTap: (index) {
+        onTap(index);
+        // Navigate to different screens based on tab
+        switch (index) {
+          case 0:
+            Navigator.pushNamed(context, AppRoutes.home);
+            break;
+          case 1:
+            // Navigate to history screen when implemented
+            break;
+          case 2:
+            Navigator.pushNamed(context, AppRoutes.profile);
+            break;
+        }
+      },
       backgroundColor: Colors.white,
       selectedItemColor: AppColors.primaryBlue,
       unselectedItemColor: Colors.grey,
@@ -29,10 +44,7 @@ class BottomNav extends StatelessWidget {
       ),
       type: BottomNavigationBarType.fixed,
       items: const [
-        BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.home),
-          label: 'Home',
-        ),
+        BottomNavigationBarItem(icon: Icon(CupertinoIcons.home), label: 'Home'),
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.clock),
           label: 'History',
