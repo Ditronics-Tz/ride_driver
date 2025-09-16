@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../core/theme.dart';
-import '../routes/route.dart'; // Added import for AppRoutes
+import '../routes/route.dart';
 
 class BottomNav extends StatelessWidget {
   final int currentIndex;
@@ -21,7 +21,10 @@ class BottomNav extends StatelessWidget {
             Navigator.pushNamed(context, AppRoutes.home);
             break;
           case 1:
-            // Navigate to history screen when implemented
+            Navigator.pushNamed(
+              context,
+              AppRoutes.history,
+            ); // Added history navigation
             break;
           case 2:
             Navigator.pushNamed(context, AppRoutes.profile);

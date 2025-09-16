@@ -37,17 +37,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         title: Text(
-          'Profile',
+          '',
           style: AppTextStyles.headingMedium.copyWith(
             color: AppColors.textWhite,
           ),
         ),
         backgroundColor: AppColors.primaryBlue,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textWhite),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false, // Removed back button
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -192,44 +189,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
 
-                  const SizedBox(height: 30),
-
-                  // Additional Options Section
-                  _buildSectionHeader('Account'),
-                  const SizedBox(height: 15),
-
-                  _buildProfileItem(
-                    icon: Icons.settings,
-                    title: 'Settings',
-                    subtitle: 'Manage your preferences',
-                    onTap: () {
-                      // Navigate to settings
-                    },
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  _buildProfileItem(
-                    icon: Icons.help_outline,
-                    title: 'Help & Support',
-                    subtitle: 'Get help and contact support',
-                    onTap: () {
-                      // Navigate to help
-                    },
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  _buildProfileItem(
-                    icon: Icons.logout,
-                    title: 'Logout',
-                    subtitle: 'Sign out of your account',
-                    onTap: () {
-                      _showLogoutDialog();
-                    },
-                    isDestructive: true,
-                  ),
-
                   const SizedBox(height: 100), // Space for bottom nav
                 ],
               ),
@@ -324,56 +283,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           size: 20,
         ),
       ),
-    );
-  }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Text(
-            'Logout',
-            style: AppTextStyles.headingMedium.copyWith(fontSize: 20),
-          ),
-          content: Text(
-            'Are you sure you want to logout?',
-            style: AppTextStyles.bodyMedium,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: AppTextStyles.button.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushReplacementNamed(context, '/welcome');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                'Logout',
-                style: AppTextStyles.button.copyWith(
-                  color: AppColors.textWhite,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

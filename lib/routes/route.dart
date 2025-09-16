@@ -5,7 +5,8 @@ import '../Screens/AuthScreens/register_screen.dart';
 import '../Screens/AuthScreens/otp.dart';
 import '../Screens/home_screen.dart';
 import '../Screens/DriverScreens/verification_screen.dart';
-import '../Screens/profile_screen.dart'; // Added profile screen import
+import '../Screens/profile_screen.dart';
+import '../Screens/history_screen.dart'; // Added history screen import
 
 class AppRoutes {
   static const String welcome = '/welcome';
@@ -15,6 +16,7 @@ class AppRoutes {
   static const String mainNavigation = '/main';
   static const String home = '/home';
   static const String profile = '/profile';
+  static const String history = '/history'; // Added history route
   static const String rides = '/rides';
   static const String earnings = '/earnings';
   static const String verification = '/verification';
@@ -25,7 +27,8 @@ class AppRoutes {
     register: (context) => const RegisterScreen(),
     otp: (context) => const OtpScreen(),
     home: (context) => const HomeScreen(),
-    profile: (context) => const ProfileScreen(), // Added profile screen
+    profile: (context) => const ProfileScreen(),
+    history: (context) => const HistoryScreen(), // Added history screen
     verification: (context) => const VerificationScreen(),
   };
 
@@ -41,8 +44,10 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const OtpScreen());
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
-      case profile: // Added profile case
+      case profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case history: // Added history case
+        return MaterialPageRoute(builder: (_) => const HistoryScreen());
       case verification:
         return MaterialPageRoute(builder: (_) => const VerificationScreen());
       default:
