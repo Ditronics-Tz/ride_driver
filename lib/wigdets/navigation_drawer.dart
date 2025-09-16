@@ -51,7 +51,7 @@ class AppNavigationDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.home, color: AppColors.primaryBlue),
+            leading: Icon(Icons.home_rounded, color: AppColors.primaryBlue),
             title: Text(
               'Home',
               style: AppTextStyles.poppins(
@@ -66,9 +66,12 @@ class AppNavigationDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.history, color: AppColors.primaryBlue),
+            leading: Icon(
+              Icons.verified_user_rounded,
+              color: AppColors.primaryBlue,
+            ),
             title: Text(
-              'History',
+              'Verification',
               style: AppTextStyles.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -77,27 +80,15 @@ class AppNavigationDrawer extends StatelessWidget {
             ),
             onTap: () {
               Navigator.pop(context);
-              onTabSelected(1);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.person, color: AppColors.primaryBlue),
-            title: Text(
-              'Profile',
-              style: AppTextStyles.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              onTabSelected(2);
+              // Add verification navigation
             },
           ),
           const Divider(),
           ListTile(
-            leading: Icon(Icons.settings, color: AppColors.textSecondary),
+            leading: Icon(
+              Icons.settings_rounded,
+              color: AppColors.textSecondary,
+            ),
             title: Text(
               'Settings',
               style: AppTextStyles.poppins(
@@ -112,7 +103,7 @@ class AppNavigationDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.logout, color: AppColors.error),
+            leading: Icon(Icons.logout_rounded, color: AppColors.error),
             title: Text(
               'Logout',
               style: AppTextStyles.poppins(
