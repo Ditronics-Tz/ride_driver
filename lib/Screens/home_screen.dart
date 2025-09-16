@@ -30,26 +30,29 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      body: Stack(
-        children: [
-          // Main content
-          _screens[_currentIndex],
+      body: SafeArea(
+        // Add SafeArea here
+        child: Stack(
+          children: [
+            // Main content
+            _screens[_currentIndex],
 
-          // Floating hamburger menu button
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 16,
-            left: 16,
-            child: FloatingActionButton.small(
-              onPressed: () {
-                _scaffoldKey.currentState?.openDrawer();
-              },
-              backgroundColor: AppColors.primaryBlue,
-              foregroundColor: AppColors.textWhite,
-              elevation: 4,
-              child: const Icon(Icons.menu, size: 20),
+            // Floating hamburger menu button
+            Positioned(
+              top: 16, // Remove MediaQuery padding since we're using SafeArea
+              left: 16,
+              child: FloatingActionButton.small(
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+                backgroundColor: AppColors.primaryBlue,
+                foregroundColor: AppColors.textWhite,
+                elevation: 4,
+                child: const Icon(Icons.menu, size: 20),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
 
       // Drawer for navigation menu

@@ -29,7 +29,10 @@ class BottomNav extends StatelessWidget {
       ),
       type: BottomNavigationBarType.fixed,
       items: const [
-        BottomNavigationBarItem(icon: Icon(CupertinoIcons.home), label: 'Home'),
+        BottomNavigationBarItem(
+          icon: Icon(CupertinoIcons.home),
+          label: 'Home',
+        ),
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.clock),
           label: 'History',
