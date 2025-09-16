@@ -52,13 +52,8 @@ class _MapViewState extends ConsumerState<MapView>
               ),
               children: [
                 TileLayer(
-                  urlTemplate:
-                      'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
-                  additionalOptions: const {
-                    'accessToken': 'YOUR_STADIA_MAPS_API_KEY',
-                  },
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.example.ride_driver',
-                  subdomains: const ['a', 'b', 'c', 'd'],
                 ),
                 MarkerLayer(
                   markers: [Marker(point: location, child: _AnimatedMarker())],
@@ -72,6 +67,7 @@ class _MapViewState extends ConsumerState<MapView>
           right: 16,
           bottom: 16,
           child: FloatingActionButton(
+            heroTag: 'recenterMap', // Add unique hero tag
             onPressed: () {
               final location = ref.read(currentLocationProvider).value;
               if (location != null) {
@@ -100,7 +96,7 @@ class _MapAttribution extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: const Text(
-        '© Stadia Maps, © OpenStreetMap contributors',
+        '',
         style: TextStyle(fontSize: 10, color: Colors.black54),
       ),
     );

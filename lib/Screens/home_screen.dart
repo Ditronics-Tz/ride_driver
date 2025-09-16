@@ -39,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
               top: 16,
               left: 16,
               child: FloatingActionButton.small(
+                heroTag: 'menuButton', // Add unique hero tag
                 onPressed: () {
                   _scaffoldKey.currentState?.openDrawer();
                 },
