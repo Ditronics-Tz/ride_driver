@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../wigdets/map_view.dart';
 import '../wigdets/bottom_nav.dart';
 import '../core/theme.dart';
+import '../wigdets/navigation_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,15 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       body: SafeArea(
-        // Add SafeArea here
         child: Stack(
           children: [
-            // Main content
             _screens[_currentIndex],
-
-            // Floating hamburger menu button
             Positioned(
-              top: 16, // Remove MediaQuery padding since we're using SafeArea
+              top: 16,
               left: 16,
               child: FloatingActionButton.small(
                 onPressed: () {
@@ -54,130 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-
-      // Drawer for navigation menu
-      drawer: Drawer(
-        backgroundColor: AppColors.backgroundWhite,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                gradient: AppColors.primaryGradient,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: AppColors.textWhite,
-                    child: Icon(
-                      Icons.person,
-                      size: 30,
-                      color: AppColors.primaryBlue,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Driver Name',
-                    style: AppTextStyles.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textWhite,
-                    ),
-                  ),
-                  Text(
-                    'Online',
-                    style: AppTextStyles.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textWhite.withOpacity(0.8),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.home, color: AppColors.primaryBlue),
-              title: Text(
-                'Home',
-                style: AppTextStyles.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                _onTabTapped(0); // Home = index 0
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.history, color: AppColors.primaryBlue),
-              title: Text(
-                'History',
-                style: AppTextStyles.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                _onTabTapped(1); // History = index 1
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.person, color: AppColors.primaryBlue),
-              title: Text(
-                'Profile',
-                style: AppTextStyles.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                _onTabTapped(2); // Profile = index 2
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: Icon(Icons.settings, color: AppColors.textSecondary),
-              title: Text(
-                'Settings',
-                style: AppTextStyles.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                // Add settings navigation
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout, color: AppColors.error),
-              title: Text(
-                'Logout',
-                style: AppTextStyles.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                // Add logout functionality
-              },
-            ),
-          ],
-        ),
-      ),
-
+      drawer: AppNavigationDrawer(onTabSelected: _onTabTapped), // Updated here
       bottomNavigationBar: BottomNav(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
