@@ -3,7 +3,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:latlong2/latlong.dart';
 import '../providers/map_provider.dart';
 
 class MapView extends ConsumerStatefulWidget {
