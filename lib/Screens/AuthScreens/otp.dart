@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   int _secondsLeft = 30;
   Timer? _timer;
   PendingOtp? _pending;
+  bool _isProgrammaticChange = false;
 
   TextStyle gText(
     double size,
@@ -81,18 +83,107 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   }
 
   void _onChanged(int index, String value) {
-    if (value.length > 1) {
-      _controllers[index].text = value[0];
-      _controllers[index].selection = const TextSelection.collapsed(offset: 1);
+    if (_isProgrammaticChange) {
+      return;
     }
-    if (value.isNotEmpty) {
+
+    final sanitized = value.toUpperCase().replaceAll(RegExp(r'[^0-9A-Z]'), '');
+
+    if (sanitized != value) {
+      _isProgrammaticChange = true;
+      _controllers[index].value = TextEditingValue(
+        text: sanitized,
+        selection: TextSelection.collapsed(
+          offset: sanitized.isEmpty
+              ? 0
+              : sanitized.length > 1
+                  ? 1
+                  : sanitized.length,
+        ),
+      );
+      _isProgrammaticChange = false;
+      if (sanitized.isEmpty) {
+        setState(() {});
+        return;
+      }
+    }
+
+    if (sanitized.isEmpty) {
+      setState(() {});
+      return;
+    }
+
+    if (sanitized.length > 1) {
+      _applyPastedInput(index, sanitized);
+    } else {
+      if (_controllers[index].text != sanitized) {
+        _isProgrammaticChange = true;
+        _controllers[index].value = TextEditingValue(
+          text: sanitized,
+          selection: const TextSelection.collapsed(offset: 1),
+        );
+        _isProgrammaticChange = false;
+      }
       if (index < _otpLength - 1) {
         _focusNodes[index + 1].requestFocus();
       } else {
         _focusNodes[index].unfocus();
       }
     }
+
     setState(() {});
+  }
+
+  void _applyPastedInput(int startIndex, String value) {
+    if (value.isEmpty) {
+      return;
+    }
+
+    final maxChars = math.min(value.length, _otpLength);
+    final uppercase = value.substring(0, maxChars).toUpperCase();
+
+    if (uppercase.length >= _otpLength) {
+      _setFullCode(uppercase.substring(0, _otpLength));
+      return;
+    }
+
+    final availableSlots = math.max(0, _otpLength - startIndex);
+    if (availableSlots == 0) {
+      return;
+    }
+    final trimmedLength = math.min(uppercase.length, availableSlots);
+    final trimmed = uppercase.substring(0, trimmedLength);
+
+    _isProgrammaticChange = true;
+    var idx = startIndex;
+    for (final char in trimmed.split('')) {
+      if (idx >= _otpLength) break;
+      _controllers[idx].value = TextEditingValue(
+        text: char,
+        selection: const TextSelection.collapsed(offset: 1),
+      );
+      idx++;
+    }
+    _isProgrammaticChange = false;
+
+    if (idx < _otpLength) {
+      _focusNodes[idx].requestFocus();
+    } else {
+      _focusNodes[_otpLength - 1].unfocus();
+    }
+  }
+
+  void _setFullCode(String code) {
+    final chars = code.split('');
+    _isProgrammaticChange = true;
+    for (var i = 0; i < _otpLength; i++) {
+      _controllers[i].value = TextEditingValue(
+        text: chars[i],
+        selection: const TextSelection.collapsed(offset: 1),
+      );
+    }
+    _isProgrammaticChange = false;
+    _focusNodes[_otpLength - 1].unfocus();
   }
 
   void _onKey(RawKeyEvent event, int index) {
@@ -106,7 +197,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
   }
 
-  String get _enteredCode => _controllers.map((c) => c.text).join();
+  String get _enteredCode =>
+      _controllers.map((c) => c.text.toUpperCase()).join();
 
   bool get _isComplete =>
       _enteredCode.length == _otpLength &&
@@ -526,8 +618,13 @@ class _OtpBoxState extends State<_OtpBox> with SingleTickerProviderStateMixin {
                 controller: widget.controller,
                 focusNode: widget.focusNode,
                 textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                keyboardType: TextInputType.visiblePassword,
+                textCapitalization: TextCapitalization.characters,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z]')),
+                ],
+                enableSuggestions: false,
+                autocorrect: false,
                 textInputAction: TextInputAction.next,
                 maxLength: 1,
                 style: widget.textBuilder(
