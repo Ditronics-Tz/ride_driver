@@ -2,19 +2,23 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:getwidget/getwidget.dart';
 import '../../core/theme.dart'; // Add this import
+import '../../core/network/api_exceptions.dart';
+import '../../providers/auth_provider.dart';
+import '../../routes/route.dart';
 
-class OtpScreen extends StatefulWidget {
+class OtpScreen extends ConsumerStatefulWidget {
   final String phoneMasked; // e.g. "+255 ....."
   const OtpScreen({super.key, this.phoneMasked = '+255 .....'});
 
   @override
-  State<OtpScreen> createState() => _OtpScreenState();
+  ConsumerState<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpScreenState extends ConsumerState<OtpScreen> {
   static const int _otpLength = 4;
   final List<TextEditingController> _controllers = List.generate(
     _otpLength,
@@ -25,9 +29,9 @@ class _OtpScreenState extends State<OtpScreen> {
     (_) => FocusNode(),
   );
 
-  bool _submitting = false;
   int _secondsLeft = 30;
   Timer? _timer;
+  PendingOtp? _pending;
 
   TextStyle gText(
     double size,
@@ -48,6 +52,7 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   void initState() {
     super.initState();
+    _pending = ref.read(authControllerProvider).pendingOtp ?? _pending;
     _startCountdown();
   }
 
@@ -108,46 +113,63 @@ class _OtpScreenState extends State<OtpScreen> {
       _enteredCode.split('').every((ch) => ch.trim().isNotEmpty);
 
   Future<void> _submit() async {
-    if (!_isComplete || _submitting) return;
-    setState(() => _submitting = true);
-    await Future.delayed(const Duration(seconds: 1));
-    if (!mounted) return;
-    setState(() => _submitting = false);
+    if (!_isComplete) return;
+    final pending = ref.read(authControllerProvider).pendingOtp ?? _pending;
+    if (pending == null) {
+      _showSnack('No OTP challenge found. Please login again.', success: false);
+      return;
+    }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'OTP $_enteredCode verified (placeholder)',
-          style: gText(17, FontWeight.w600, color: Colors.white),
-        ),
-        backgroundColor: AppColors.primaryBlueDarker, // Use theme color
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    FocusScope.of(context).unfocus();
+    final controller = ref.read(authControllerProvider.notifier);
 
-    // Navigate to home screen
-    Navigator.of(context).pushReplacementNamed('/home');
+    try {
+      final res = await controller.verifyOtp(_enteredCode);
+      if (!mounted) return;
+
+      _showSnack(res.message.isNotEmpty ? res.message : 'OTP verified successfully');
+      setState(() => _pending = null);
+
+      await Future.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.home,
+        (route) => false,
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      _showSnack(e.message, success: false);
+    } catch (_) {
+      if (!mounted) return;
+      _showSnack('Verification failed. Please try again.', success: false);
+    }
   }
 
-  void _resend() {
+  Future<void> _resend() async {
     if (_secondsLeft > 0) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'OTP resent (placeholder)',
-          style: gText(16, FontWeight.w500, color: Colors.white),
-        ),
-        backgroundColor: AppColors.primaryBlueDarker, // Use theme color
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    _startCountdown();
+    final controller = ref.read(authControllerProvider.notifier);
+    try {
+      final message = await controller.resendOtp();
+      if (!mounted) return;
+      _showSnack(message);
+      _startCountdown();
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      _showSnack(e.message, success: false);
+    } catch (_) {
+      if (!mounted) return;
+      _showSnack('Failed to resend OTP. Please try again.', success: false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final authState = ref.watch(authControllerProvider);
+    final isLoading = authState.isLoading;
+    final pending = authState.pendingOtp ?? _pending;
+    final contactLabel = pending?.maskedContact ?? widget.phoneMasked;
 
     return Scaffold(
       body: Container(
@@ -179,7 +201,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     _buildOtpTitle(),
                     const SizedBox(height: 12),
                     Text(
-                      'We have sent an OTP on a given Number\n${widget.phoneMasked}',
+                      'We have sent an OTP on a given Number\n$contactLabel',
                       style: gText(
                         15,
                         FontWeight.w500,
@@ -245,14 +267,14 @@ class _OtpScreenState extends State<OtpScreen> {
                       width: double.infinity,
                       height: 56,
                       child: GFButton(
-                        onPressed: _isComplete && !_submitting ? _submit : null,
+                        onPressed: _isComplete && !isLoading ? _submit : null,
                         size: GFSize.LARGE,
                         color: AppColors.primaryBlue, // Use theme color
                         elevation: _isComplete ? 6 : 2,
                         shape: GFButtonShape.pills,
                         fullWidthButton: true,
                         textStyle: gText(18, FontWeight.w600),
-                        child: _submitting
+                        child: isLoading
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -374,6 +396,22 @@ class _OtpScreenState extends State<OtpScreen> {
         ],
       ),
     );
+  }
+
+  void _showSnack(String message, {bool success = true}) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: gText(16, FontWeight.w600, color: Colors.white),
+          ),
+          backgroundColor:
+              success ? AppColors.primaryBlueDarker : Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 }
 

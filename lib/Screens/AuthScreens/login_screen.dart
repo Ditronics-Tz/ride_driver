@@ -1,24 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import '../../routes/route.dart';
+import '../../core/network/api_exceptions.dart';
+import '../../providers/auth_provider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _obscure = true;
-  bool _loading = false;
 
   @override
   void dispose() {
@@ -56,6 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final authState = ref.watch(authControllerProvider);
+    final isLoading = authState.isLoading;
 
     // ---------- TUNING ----------
     final double carHeightFactor = 0.55;     // Fraction of screen height used by the car image
@@ -209,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                           child: GFButton(
-                            onPressed: (_loading || !_isFormFilled) 
+                            onPressed: (isLoading || !_isFormFilled) 
                                 ? () {
                                     // Show helpful message when button is disabled
                                     if (!_isFormFilled) {
@@ -231,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.2,
                             ),
-                            child: _loading
+              child: isLoading
                                 ? Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -266,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 32,
                         alignment: Alignment.center,
                         child: TextButton(
-                          onPressed: _loading ? null : _forgotPassword,
+                          onPressed: isLoading ? null : _forgotPassword,
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             minimumSize: Size.zero,
@@ -325,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          if (_loading)
+      if (isLoading)
             Positioned.fill(
               child: IgnorePointer(
                 child: Container(
@@ -355,34 +359,39 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
-    
-    setState(() => _loading = true);
-    
+    FocusScope.of(context).unfocus();
+    final controller = ref.read(authControllerProvider.notifier);
+
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      final pending = await controller.login(
+        identifier: _emailCtrl.text.trim(),
+        password: _passwordCtrl.text,
+      );
       if (!mounted) return;
 
       _showAwesomeSnackbar(
-        title: 'Login Successful!',
-        message: 'Welcome back! You have logged in.',
+        title: 'OTP Sent!',
+        message: pending.message,
         contentType: ContentType.success,
       );
 
-      // Navigate after a short delay to show the snackbar
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 800));
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(AppRoutes.mainNavigation);
-      
-    } catch (e) {
+      Navigator.of(context).pushNamed(AppRoutes.otp);
+    } on ApiException catch (e) {
+      if (!mounted) return;
       _showAwesomeSnackbar(
         title: 'Login Failed',
-        message: 'Invalid credentials. Please try again.',
+        message: e.message,
         contentType: ContentType.failure,
       );
-    } finally {
-      if (mounted) {
-        setState(() => _loading = false);
-      }
+    } catch (_) {
+      if (!mounted) return;
+      _showAwesomeSnackbar(
+        title: 'Login Failed',
+        message: 'Unexpected error. Please try again.',
+        contentType: ContentType.failure,
+      );
     }
   }
 
@@ -395,7 +404,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleGoogle() {
-    if (_loading) return;
+    if (ref.read(authControllerProvider).isLoading) return;
     _showAwesomeSnackbar(
       title: 'Google Login',
       message: 'Google login is coming soon!',
@@ -404,7 +413,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleApple() {
-    if (_loading) return;
+    if (ref.read(authControllerProvider).isLoading) return;
     _showAwesomeSnackbar(
       title: 'Apple Login',
       message: 'Apple login is coming soon!',

@@ -1,19 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import '../../routes/route.dart';
+import '../../core/network/api_exceptions.dart';
+import '../../providers/auth_provider.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _contactCtrl = TextEditingController();
@@ -22,7 +25,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _obscurePass = true;
   bool _obscureConfirm = true;
-  bool _loading = false;
   bool _acceptedTerms = false;
 
   @override
@@ -58,12 +60,60 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _submit() async {
-    // BYPASS: Go directly to OTP without validation
-    setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 500));
-    if (!mounted) return;
-    setState(() => _loading = false);
-    Navigator.of(context).pushReplacementNamed(AppRoutes.otp);
+    if (!_formKey.currentState!.validate()) {
+      _showAwesomeSnackbar(
+        title: 'Validation Error',
+        message: 'Please correct the highlighted fields',
+        contentType: ContentType.warning,
+      );
+      return;
+    }
+
+    if (!_acceptedTerms) {
+      _showAwesomeSnackbar(
+        title: 'Terms Required',
+        message: 'Please accept the terms to continue',
+        contentType: ContentType.help,
+      );
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+    final controller = ref.read(authControllerProvider.notifier);
+
+    try {
+      final pending = await controller.register(
+        fullName: _nameCtrl.text.trim(),
+        contact: _contactCtrl.text.trim(),
+        password: _passwordCtrl.text,
+        confirmPassword: _confirmCtrl.text,
+      );
+      if (!mounted) return;
+
+      _showAwesomeSnackbar(
+        title: 'Registration Successful!',
+        message: pending.message,
+        contentType: ContentType.success,
+      );
+
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted) return;
+      Navigator.of(context).pushNamed(AppRoutes.otp);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      _showAwesomeSnackbar(
+        title: 'Registration Failed',
+        message: e.message,
+        contentType: ContentType.failure,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      _showAwesomeSnackbar(
+        title: 'Registration Failed',
+        message: 'Unexpected error. Please try again.',
+        contentType: ContentType.failure,
+      );
+    }
   }
 
   // Check if form is filled to show next components
@@ -77,13 +127,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final authState = ref.watch(authControllerProvider);
+    final isLoading = authState.isLoading;
     final double carHeightFactor = 0.55;
     final double carBottomOvershoot = 0.0;
     final Color globalOverlayColor = const Color(0xFF0C3C85);
     final double globalOverlayOpacity = 0.55;
     const double pillRadius = 40;
 
-    final canSubmit = !_loading && _acceptedTerms && _isFormFilled;
+    final canSubmit = _acceptedTerms && _isFormFilled;
 
     return Scaffold(
       resizeToAvoidBottomInset: true, // This helps with keyboard issues
@@ -293,7 +345,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ],
                           ),
                           child: GFButton(
-                            onPressed: _loading ? null : _submit,
+                            onPressed: isLoading
+                                ? null
+                                : () {
+                                    if (!canSubmit) {
+                                      _showAwesomeSnackbar(
+                                        title: 'Incomplete',
+                                        message: 'Fill all fields and accept the terms',
+                                        contentType: ContentType.help,
+                                      );
+                                      return;
+                                    }
+                                    _submit();
+                                  },
                             size: GFSize.LARGE,
                             color: Colors.transparent,
                             elevation: 0,
@@ -304,7 +368,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.2,
                             ),
-                            child: _loading
+              child: isLoading
                                 ? Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -350,7 +414,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
 
-          if (_loading)
+          if (isLoading)
             Positioned.fill(
               child: IgnorePointer(
                 child: Container(
