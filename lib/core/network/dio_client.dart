@@ -21,9 +21,15 @@ class DioClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await TokenStorage.instance.accessToken;
-          if (token != null && token.isNotEmpty) {
-            options.headers[constants.Headers.auth] = 'Bearer $token';
+          if (_shouldAttachAuthHeader(options.path)) {
+            final token = await TokenStorage.instance.accessToken;
+            if (token != null && token.isNotEmpty) {
+              options.headers[constants.Headers.auth] = 'Bearer $token';
+            } else {
+              options.headers.remove(constants.Headers.auth);
+            }
+          } else {
+            options.headers.remove(constants.Headers.auth);
           }
           if (Env.isDebug) {
             // Lightweight log
@@ -81,6 +87,17 @@ class DioClient {
 
   bool _isRefreshing = false;
   final List<QueuedRequest> _queue = [];
+
+  bool _shouldAttachAuthHeader(String path) {
+    final normalizedPath = path.split('?').first;
+    const publicEndpoints = {
+      constants.ApiEndpoints.register,
+      constants.ApiEndpoints.login,
+      constants.ApiEndpoints.verifyOtp,
+      constants.ApiEndpoints.resendOtp,
+    };
+    return !publicEndpoints.any((endpoint) => normalizedPath.endsWith(endpoint));
+  }
 
   Future<Response<T>> get<T>(
     String path, {

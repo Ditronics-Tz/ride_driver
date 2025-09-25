@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import '../routes/route.dart'; 
-import '../core/theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AppNavigationDrawer extends StatelessWidget {
+import '../core/theme.dart';
+import '../providers/auth_provider.dart';
+import '../routes/route.dart';
+
+class AppNavigationDrawer extends ConsumerWidget {
   final Function(int) onTabSelected;
 
   const AppNavigationDrawer({super.key, required this.onTabSelected});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Drawer(
       backgroundColor: AppColors.backgroundWhite,
       child: ListView(
@@ -113,9 +116,34 @@ class AppNavigationDrawer extends StatelessWidget {
                 color: AppColors.textPrimary,
               ),
             ),
-            onTap: () {
+            onTap: () async {
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
-              // Add logout functionality
+
+              try {
+                await ref.read(authControllerProvider.notifier).logout();
+                navigator.pushNamedAndRemoveUntil(
+                  AppRoutes.welcome,
+                  (route) => false,
+                );
+              } catch (error) {
+                messenger
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        error.toString(),
+                        style: AppTextStyles.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textWhite,
+                        ),
+                      ),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+              }
             },
           ),
         ],

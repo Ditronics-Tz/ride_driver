@@ -465,7 +465,7 @@ class _RegisterForm extends StatelessWidget {
 
   bool _isValidEmail(String v) {
     final emailRegex =
-        RegExp(r'^[A-Za-z0-9._%+\-]+@[A-ZaZ0-9.\-]+\.[A-Za-z]{2,}$');
+        RegExp(r'^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$');
     return emailRegex.hasMatch(v);
   }
 
