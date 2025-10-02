@@ -34,12 +34,10 @@ class _LoadingScreenState extends State<LoadingScreen>
       ),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutBack,
-      ),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     _controller.forward();
 
@@ -83,32 +81,6 @@ class _LoadingScreenState extends State<LoadingScreen>
             ),
           ),
 
-          // Car icon background (matching auth screens)
-          Positioned.fill(
-            child: Center(
-              child: Opacity(
-                opacity: 0.15,
-                child: Container(
-                  width: size.width * 0.8,
-                  height: size.width * 0.8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF123A91),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
-                      width: 2,
-                    ),
-                  ),
-                  child: const Icon(
-                    CupertinoIcons.car_detailed,
-                    size: 180,
-                    color: Colors.white30,
-                  ),
-                ),
-              ),
-            ),
-          ),
-
           // Uniform overlay tint
           Positioned.fill(
             child: IgnorePointer(
@@ -118,8 +90,8 @@ class _LoadingScreenState extends State<LoadingScreen>
             ),
           ),
 
-          // Content
-          SafeArea(
+          // Content - Centered
+          Center(
             child: AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
@@ -127,63 +99,65 @@ class _LoadingScreenState extends State<LoadingScreen>
                   opacity: _fadeAnimation.value,
                   child: Transform.scale(
                     scale: _scaleAnimation.value,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Brand Header
-                        _BrandHeader(),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Brand Header
+                          _BrandHeader(),
 
-                        const SizedBox(height: 80),
+                          const SizedBox(height: 60),
 
-                        // Loading Indicator
-                        const _CircularLoadingIndicator(),
+                          // Loading Indicator
+                          const _CircularLoadingIndicator(),
 
-                        const SizedBox(height: 40),
+                          const SizedBox(height: 60),
 
-                        // Welcome Message
-                        Text(
-                          'Welcome to',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withOpacity(0.9),
-                            letterSpacing: 0.5,
+                          // Welcome Message
+                          Text(
+                            'Welcome to',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withOpacity(0.9),
+                              letterSpacing: 0.5,
+                            ),
                           ),
-                        ),
 
-                        const SizedBox(height: 8),
+                          const SizedBox(height: 12),
 
-                        _GradientText(
-                          'RideShare App',
-                          style: GoogleFonts.poppins(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.5,
+                          _GradientText(
+                            'RideShare App',
+                            style: GoogleFonts.poppins(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.5,
+                            ),
+                            gradient: const LinearGradient(
+                              colors: [Colors.white, Color(0xFF8CCBFF)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
                           ),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Colors.white,
-                              Color(0xFF8CCBFF),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
 
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 20),
 
-                        Text(
-                          'Your journey to earning starts here',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white.withOpacity(0.8),
-                            letterSpacing: 0.3,
+                          Text(
+                            'Your journey to earning starts here',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white.withOpacity(0.85),
+                              letterSpacing: 0.3,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -196,54 +170,26 @@ class _LoadingScreenState extends State<LoadingScreen>
   }
 }
 
-// Brand Header with Logo
+// Brand Header with Logo - NO ICON
 class _BrandHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Logo Circle
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.12),
-            border: Border.all(
-              width: 2,
-              color: Colors.white.withOpacity(0.25),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 30,
-                offset: const Offset(0, 15),
-              ),
-            ],
-          ),
-          child: const Icon(
-            CupertinoIcons.car_detailed,
-            color: Colors.white,
-            size: 50,
-          ),
-        ),
-        const SizedBox(height: 20),
-
         // App Name
         _GradientText(
           'RideApp',
           style: GoogleFonts.poppins(
-            fontSize: 44,
+            fontSize: 52,
             fontWeight: FontWeight.w700,
-            letterSpacing: -1,
+            letterSpacing: -1.2,
             height: 1.0,
           ),
           gradient: const LinearGradient(
-            colors: [
-              Colors.white,
-              Color(0xFF8CCBFF),
-            ],
+            colors: [Colors.white, Color(0xFF8CCBFF)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -253,7 +199,7 @@ class _BrandHeader extends StatelessWidget {
   }
 }
 
-// Circular Loading Indicator with Animation
+// Circular Loading Indicator with Animation - NO ICON INSIDE
 class _CircularLoadingIndicator extends StatefulWidget {
   const _CircularLoadingIndicator();
 
@@ -324,22 +270,14 @@ class __CircularLoadingIndicatorState extends State<_CircularLoadingIndicator>
           ),
         ),
 
-        // Inner white circle
+        // Inner white circle - NO ICON
         Container(
           width: 64,
           height: 64,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: const Color(0xFF2563EB),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.3),
-              width: 2,
-            ),
-          ),
-          child: const Icon(
-            CupertinoIcons.checkmark_alt,
-            color: Colors.white,
-            size: 28,
+            border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
           ),
         ),
       ],
@@ -353,22 +291,14 @@ class _GradientText extends StatelessWidget {
   final TextStyle style;
   final Gradient gradient;
 
-  const _GradientText(
-    this.text, {
-    required this.style,
-    required this.gradient,
-  });
+  const _GradientText(this.text, {required this.style, required this.gradient});
 
   @override
   Widget build(BuildContext context) {
     return ShaderMask(
       blendMode: BlendMode.srcIn,
       shaderCallback: (rect) => gradient.createShader(rect),
-      child: Text(
-        text,
-        style: style,
-        textAlign: TextAlign.center,
-      ),
+      child: Text(text, style: style, textAlign: TextAlign.center),
     );
   }
 }
