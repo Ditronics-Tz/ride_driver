@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Screens/loading_screen.dart';
 import '../Screens/welcome.dart';
 import '../Screens/AuthScreens/login_screen.dart';
 import '../Screens/AuthScreens/register_screen.dart';
@@ -9,6 +10,7 @@ import '../Screens/profile_screen.dart';
 import '../Screens/history_screen.dart'; // Added history screen import
 
 class AppRoutes {
+  static const String loading = '/loading';
   static const String welcome = '/welcome';
   static const String login = '/login';
   static const String register = '/register';
@@ -22,6 +24,7 @@ class AppRoutes {
   static const String verification = '/verification';
 
   static Map<String, WidgetBuilder> get routes => {
+    loading: (context) => const LoadingScreen(),
     welcome: (context) => const WelcomeScreen(),
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
@@ -34,6 +37,8 @@ class AppRoutes {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case loading:
+        return MaterialPageRoute(builder: (_) => const LoadingScreen());
       case welcome:
         return MaterialPageRoute(builder: (_) => const WelcomeScreen());
       case login:

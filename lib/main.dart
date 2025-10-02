@@ -37,8 +37,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      // Set welcome screen as initial route
-      initialRoute: AppRoutes.welcome,
+      // Set loading screen as initial route
+      initialRoute: AppRoutes.loading,
       routes: AppRoutes.routes,
       onGenerateRoute: AppRoutes.generateRoute,
     );
