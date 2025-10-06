@@ -6,7 +6,7 @@ class Env {
   static String get baseUrl {
     switch (current) {
       case AppEnvironment.dev:
-        return 'http://31.220.82.177:9090/api/v1';
+        return 'http://31.220.82.177:9091/api/v1';
       case AppEnvironment.prod:
         return 'https://your-prod-domain.com/api/v1';
     }

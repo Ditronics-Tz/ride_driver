@@ -168,10 +168,13 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
                   child: Column(
                     children: [
                       _buildPickupField(),
-                      if (_showPickupResults) _buildPickupResults(),
                       const SizedBox(height: 16),
                       _buildDropoffField(),
-                      if (_showDropoffResults) _buildDropoffResults(),
+                      if (_showPickupResults || _showDropoffResults) ...[
+                        const SizedBox(height: 16),
+                        if (_showPickupResults) _buildPickupResults(),
+                        if (_showDropoffResults) _buildDropoffResults(),
+                      ],
                     ],
                   ),
                 ),
