@@ -37,8 +37,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      // Set loading screen as initial route
-      initialRoute: AppRoutes.loading,
+      // Temporarily bypass auth: start at home
+      initialRoute: AppRoutes.home,
       routes: AppRoutes.routes,
       onGenerateRoute: AppRoutes.generateRoute,
     );

@@ -8,8 +8,13 @@ import '../Screens/home_screen.dart';
 import '../Screens/DriverScreens/verification_screen.dart';
 import '../Screens/profile_screen.dart';
 import '../Screens/history_screen.dart'; // Added history screen import
+import '../wigdets/ride_card.dart';
+
+import 'package:latlong2/latlong.dart';
 
 class AppRoutes {
+  // Toggle to disable auth flows for internal polishing
+  static const bool authDisabled = true;
   static const String loading = '/loading';
   static const String welcome = '/welcome';
   static const String login = '/login';
@@ -22,6 +27,7 @@ class AppRoutes {
   static const String rides = '/rides';
   static const String earnings = '/earnings';
   static const String verification = '/verification';
+  static const String map = '/map';
 
   static Map<String, WidgetBuilder> get routes => {
     loading: (context) => const LoadingScreen(),
@@ -38,15 +44,25 @@ class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case loading:
-        return MaterialPageRoute(builder: (_) => const LoadingScreen());
+        return authDisabled
+            ? MaterialPageRoute(builder: (_) => const HomeScreen())
+            : MaterialPageRoute(builder: (_) => const LoadingScreen());
       case welcome:
-        return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+        return authDisabled
+            ? MaterialPageRoute(builder: (_) => const HomeScreen())
+            : MaterialPageRoute(builder: (_) => const WelcomeScreen());
       case login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        return authDisabled
+            ? MaterialPageRoute(builder: (_) => const HomeScreen())
+            : MaterialPageRoute(builder: (_) => const LoginScreen());
       case register:
-        return MaterialPageRoute(builder: (_) => const RegisterScreen());
+        return authDisabled
+            ? MaterialPageRoute(builder: (_) => const HomeScreen())
+            : MaterialPageRoute(builder: (_) => const RegisterScreen());
       case otp:
-        return MaterialPageRoute(builder: (_) => const OtpScreen());
+        return authDisabled
+            ? MaterialPageRoute(builder: (_) => const HomeScreen())
+            : MaterialPageRoute(builder: (_) => const OtpScreen());
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case profile:
@@ -55,6 +71,61 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HistoryScreen());
       case verification:
         return MaterialPageRoute(builder: (_) => const VerificationScreen());
+      case rides:
+        {
+          LatLng? start;
+          LatLng? end;
+          final args = settings.arguments;
+          if (args is Map<String, dynamic>) {
+            if (args['start'] is LatLng) start = args['start'] as LatLng;
+            if (args['end'] is LatLng) end = args['end'] as LatLng;
+          }
+          return MaterialPageRoute(
+            builder: (context) => Scaffold(
+              body: SafeArea(
+                child: RideCard(
+                  title:
+                      'Ride from (${start?.latitude.toStringAsFixed(2) ?? 'N/A'}, ${start?.longitude.toStringAsFixed(2) ?? 'N/A'}) to (${end?.latitude.toStringAsFixed(2) ?? 'N/A'}, ${end?.longitude.toStringAsFixed(2) ?? 'N/A'})',
+                  subtitle: 'Tap to view details',
+                ),
+              ),
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: 0,
+                onTap: (i) {
+                  switch (i) {
+                    case 0:
+                      Navigator.pushReplacementNamed(context, AppRoutes.home);
+                      break;
+                    case 1:
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.history,
+                      );
+                      break;
+                    case 2:
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.profile,
+                      );
+                      break;
+                  }
+                },
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Ride'),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.history),
+                    label: 'History',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Profile',
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

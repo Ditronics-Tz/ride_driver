@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import '../wigdets/map_view.dart';
 import '../wigdets/bottom_nav.dart';
 import '../core/theme.dart';
 import '../wigdets/navigation_drawer.dart';
 import '../wigdets/ride_button.dart';
+import '../wigdets/pick_location.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,75 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _createRide() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Row(
-            children: [
-              Icon(Icons.add_road, color: AppColors.primaryBlue, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                'Create Ride Trip',
-                style: AppTextStyles.headingMedium.copyWith(fontSize: 18),
-              ),
-            ],
-          ),
-          content: Text(
-            'Do you want to create a new ride trip and start accepting passengers?',
-            style: AppTextStyles.bodyMedium,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: AppTextStyles.button.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-
-                // Show success notification after creating ride
-                final snackBar = SnackBar(
-                  elevation: 0,
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Colors.transparent,
-                  content: AwesomeSnackbarContent(
-                    title: 'Ride Created!',
-                    message: 'Your ride trip has been created successfully.',
-                    contentType: ContentType.success,
-                  ),
-                );
-
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(snackBar);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryBlue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                'Create Trip',
-                style: AppTextStyles.button.copyWith(
-                  color: AppColors.textWhite,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+    // Add your implementation for creating a ride here
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
