@@ -8,6 +8,7 @@ import '../Screens/home_screen.dart';
 import '../Screens/DriverScreens/verification_screen.dart';
 import '../Screens/profile_screen.dart';
 import '../Screens/history_screen.dart'; // Added history screen import
+import '../Screens/DriverScreens/create_ride_screen.dart';
 import '../wigdets/ride_card.dart';
 
 import 'package:latlong2/latlong.dart';
@@ -25,6 +26,7 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String history = '/history'; // Added history route
   static const String rides = '/rides';
+  static const String createRide = '/create-ride';
   static const String earnings = '/earnings';
   static const String verification = '/verification';
   static const String map = '/map';
@@ -71,6 +73,30 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HistoryScreen());
       case verification:
         return MaterialPageRoute(builder: (_) => const VerificationScreen());
+      case createRide:
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          if (args == null ||
+              args['start'] == null ||
+              args['end'] == null ||
+              args['start_address'] == null ||
+              args['end_address'] == null) {
+            return MaterialPageRoute(
+              builder: (_) => Scaffold(
+                body: Center(child: Text('Invalid route parameters')),
+              ),
+            );
+          }
+
+          return MaterialPageRoute(
+            builder: (_) => CreateRideScreen(
+              start: args['start'] as LatLng,
+              end: args['end'] as LatLng,
+              startAddress: args['start_address'] as String,
+              endAddress: args['end_address'] as String,
+            ),
+          );
+        }
       case rides:
         {
           LatLng? start;

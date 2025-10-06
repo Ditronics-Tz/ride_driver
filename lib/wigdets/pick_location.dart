@@ -138,7 +138,7 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
     Navigator.pop(context);
     Navigator.pushNamed(
       context,
-      AppRoutes.rides,
+      AppRoutes.createRide,
       arguments: {
         'start': LatLng(_selectedPickup!.lat, _selectedPickup!.lng),
         'end': LatLng(_selectedDropoff!.lat, _selectedDropoff!.lng),

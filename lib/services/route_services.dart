@@ -43,7 +43,7 @@ class RideResponse {
   final double durationMin;
   final String? startAddress;
   final String? endAddress;
-  final Map<String, dynamic> geometry;
+  final dynamic geometry;
 
   RideResponse({
     required this.id,
@@ -61,7 +61,7 @@ class RideResponse {
       durationMin: (json['duration_min'] ?? 0.0).toDouble(),
       startAddress: json['start_address'],
       endAddress: json['end_address'],
-      geometry: json['geometry'] ?? {},
+      geometry: json['geometry'], // Keep as dynamic to handle various types
     );
   }
 }
