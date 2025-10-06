@@ -30,10 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _createRide() {
-    // Add your implementation for creating a ride here
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => const PickLocationDialog(),
+    );
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
