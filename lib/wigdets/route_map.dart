@@ -37,12 +37,42 @@ class _RouteMapState extends State<RouteMap> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Initial fit
       _fitMapToRoute();
+
+      // Delayed fit to ensure map is fully loaded
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          _fitMapToRoute();
+        }
+      });
     });
   }
 
+  @override
+  void didUpdateWidget(RouteMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Fit map when route points change
+    if (oldWidget.routePoints != widget.routePoints) {
+      debugPrint('Route points updated, refitting map');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _fitMapToRoute();
+      });
+    }
+  }
+
   void _fitMapToRoute() {
-    if (widget.routePoints.isEmpty) return;
+    if (widget.routePoints.isEmpty) {
+      debugPrint('No route points to fit - using start/end points');
+      // Fit to start and end points if no route points
+      final bounds = LatLngBounds.fromPoints([widget.start, widget.end]);
+      _mapController.fitCamera(
+        CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(100)),
+      );
+      return;
+    }
+
+    debugPrint('Fitting map to ${widget.routePoints.length} route points');
 
     double minLat = widget.routePoints[0].latitude;
     double maxLat = widget.routePoints[0].latitude;
@@ -56,6 +86,8 @@ class _RouteMapState extends State<RouteMap> {
       if (point.longitude > maxLng) maxLng = point.longitude;
     }
 
+    debugPrint('Route bounds: ($minLat, $minLng) to ($maxLat, $maxLng)');
+
     final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
 
     _mapController.fitCamera(
@@ -65,6 +97,14 @@ class _RouteMapState extends State<RouteMap> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint(
+      'RouteMap build - routePoints count: ${widget.routePoints.length}',
+    );
+    if (widget.routePoints.isNotEmpty) {
+      debugPrint('First route point: ${widget.routePoints.first}');
+      debugPrint('Last route point: ${widget.routePoints.last}');
+    }
+
     Widget mapContent = Stack(
       children: [
         // Map
@@ -81,19 +121,86 @@ class _RouteMapState extends State<RouteMap> {
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.example.ride_driver',
             ),
-            // Route polyline
-            if (widget.routePoints.isNotEmpty)
+            // Route polyline - Multiple layers for maximum visibility
+            if (widget.routePoints.isNotEmpty) ...[
+              // Thick background polyline
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: widget.routePoints,
+                    color: Colors.white,
+                    strokeWidth: 12.0,
+                  ),
+                ],
+              ),
+              // Main colored polyline
               PolylineLayer(
                 polylines: [
                   Polyline(
                     points: widget.routePoints,
                     color: AppColors.primaryBlue,
-                    strokeWidth: 4.0,
-                    borderColor: Colors.white,
-                    borderStrokeWidth: 1.5,
+                    strokeWidth: 8.0,
                   ),
                 ],
               ),
+              // Bright accent polyline
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: widget.routePoints,
+                    color: Colors.yellow,
+                    strokeWidth: 2.0,
+                  ),
+                ],
+              ),
+              // Debug: Show individual route points as small markers
+              MarkerLayer(
+                markers: widget.routePoints
+                    .asMap()
+                    .entries
+                    .where(
+                      (entry) => entry.key % 3 == 0,
+                    ) // Show every 3rd point
+                    .map(
+                      (entry) => Marker(
+                        point: entry.value,
+                        width: 12,
+                        height: 12,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${entry.key}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ] else ...[
+              // Show a direct line if no route points available (for debugging)
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: [widget.start, widget.end],
+                    color: Colors.red.withOpacity(0.7),
+                    strokeWidth: 4.0,
+                    borderColor: Colors.white,
+                    borderStrokeWidth: 1.0,
+                  ),
+                ],
+              ),
+            ],
             // Markers for start and end points
             MarkerLayer(
               markers: [
@@ -158,6 +265,39 @@ class _RouteMapState extends State<RouteMap> {
               right: 12,
               child: _buildRouteInfoOverlay(),
             ),
+
+          // Debug info overlay
+          Positioned(
+            bottom: 60,
+            left: 12,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Route Points: ${widget.routePoints.length}',
+                    style: const TextStyle(color: Colors.white, fontSize: 11),
+                  ),
+                  if (widget.routePoints.isNotEmpty) ...[
+                    Text(
+                      'First: ${widget.routePoints.first.latitude.toStringAsFixed(6)}, ${widget.routePoints.first.longitude.toStringAsFixed(6)}',
+                      style: const TextStyle(color: Colors.white, fontSize: 9),
+                    ),
+                    Text(
+                      'Last: ${widget.routePoints.last.latitude.toStringAsFixed(6)}, ${widget.routePoints.last.longitude.toStringAsFixed(6)}',
+                      style: const TextStyle(color: Colors.white, fontSize: 9),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
         ],
       ],
     );
