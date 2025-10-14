@@ -4,7 +4,7 @@ import '../wigdets/bottom_nav.dart';
 import '../core/theme.dart';
 import '../wigdets/navigation_drawer.dart';
 import '../wigdets/ride_button.dart';
-import '../wigdets/pick_location.dart';
+import '../routes/route.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,11 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _createRide() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => const PickLocationDialog(),
-    );
+    Navigator.pushNamed(context, AppRoutes.pickLocation);
   }
 
   @override

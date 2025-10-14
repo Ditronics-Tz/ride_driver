@@ -9,6 +9,7 @@ import '../Screens/DriverScreens/verification_screen.dart';
 import '../Screens/profile_screen.dart';
 import '../Screens/history_screen.dart'; // Added history screen import
 import '../Screens/DriverScreens/create_ride_screen.dart';
+import '../Screens/pick_location.dart';
 import '../wigdets/ride_card.dart';
 
 import 'package:latlong2/latlong.dart';
@@ -30,6 +31,7 @@ class AppRoutes {
   static const String earnings = '/earnings';
   static const String verification = '/verification';
   static const String map = '/map';
+  static const String pickLocation = '/pick-location';
 
   static Map<String, WidgetBuilder> get routes => {
     loading: (context) => const LoadingScreen(),
@@ -41,6 +43,7 @@ class AppRoutes {
     profile: (context) => const ProfileScreen(),
     history: (context) => const HistoryScreen(), // Added history screen
     verification: (context) => const VerificationScreen(),
+    pickLocation: (context) => const PickLocationScreen(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -73,6 +76,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HistoryScreen());
       case verification:
         return MaterialPageRoute(builder: (_) => const VerificationScreen());
+      case pickLocation:
+        return MaterialPageRoute(builder: (_) => const PickLocationScreen());
       case createRide:
         {
           final args = settings.arguments as Map<String, dynamic>?;

@@ -18,29 +18,31 @@ class AppNavigationDrawer extends ConsumerWidget {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(
-              gradient: AppColors.primaryGradient,
-            ),
+            decoration: const BoxDecoration(color: AppColors.backgroundWhite),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: AppColors.textWhite,
-                  child: Icon(
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.backgroundLight,
+                  ),
+                  child: const Icon(
                     Icons.person,
                     size: 30,
-                    color: AppColors.primaryBlue,
+                    color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Text(
                   'Driver Name',
                   style: AppTextStyles.poppins(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textWhite,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
@@ -48,14 +50,14 @@ class AppNavigationDrawer extends ConsumerWidget {
                   style: AppTextStyles.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textWhite.withOpacity(0.8),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
           ListTile(
-            leading: Icon(Icons.home_rounded, color: AppColors.primaryBlue),
+            leading: Icon(Icons.home_rounded, color: AppColors.textSecondary),
             title: Text(
               'Home',
               style: AppTextStyles.poppins(
@@ -72,7 +74,7 @@ class AppNavigationDrawer extends ConsumerWidget {
           ListTile(
             leading: Icon(
               Icons.verified_user_rounded,
-              color: AppColors.primaryBlue,
+              color: AppColors.textSecondary,
             ),
             title: Text(
               'Verification',
@@ -87,7 +89,7 @@ class AppNavigationDrawer extends ConsumerWidget {
               Navigator.pushNamed(context, AppRoutes.verification);
             },
           ),
-          const Divider(),
+          const Divider(color: AppColors.backgroundLight),
           ListTile(
             leading: Icon(
               Icons.settings_rounded,
@@ -107,7 +109,7 @@ class AppNavigationDrawer extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.logout_rounded, color: AppColors.error),
+            leading: Icon(Icons.logout_rounded, color: AppColors.textSecondary),
             title: Text(
               'Logout',
               style: AppTextStyles.poppins(

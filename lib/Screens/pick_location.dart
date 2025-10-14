@@ -4,15 +4,16 @@ import 'package:latlong2/latlong.dart';
 import '../core/theme.dart';
 import '../services/route_services.dart';
 import '../routes/route.dart';
+import '../wigdets/bottom_nav.dart';
 
-class PickLocationDialog extends StatefulWidget {
-  const PickLocationDialog({super.key});
+class PickLocationScreen extends StatefulWidget {
+  const PickLocationScreen({super.key});
 
   @override
-  State<PickLocationDialog> createState() => _PickLocationDialogState();
+  State<PickLocationScreen> createState() => _PickLocationScreenState();
 }
 
-class _PickLocationDialogState extends State<PickLocationDialog> {
+class _PickLocationScreenState extends State<PickLocationScreen> {
   final _pickupController = TextEditingController();
   final _dropoffController = TextEditingController();
   final _routingService = RoutingApiService();
@@ -135,7 +136,6 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
       return;
     }
 
-    Navigator.pop(context);
     Navigator.pushNamed(
       context,
       AppRoutes.createRide,
@@ -148,14 +148,20 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
     );
   }
 
+  int _currentIndex = 0;
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        constraints: const BoxConstraints(maxHeight: 600),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             // Header
             _buildHeader(),
@@ -186,6 +192,10 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNav(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+      ),
     );
   }
 
@@ -193,22 +203,25 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-        ),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.close),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context),
             color: AppColors.textPrimary,
           ),
           const SizedBox(width: 8),
           Text(
-            'Your route',
+            'Set Your Route',
             style: AppTextStyles.headingMedium.copyWith(fontSize: 20),
           ),
         ],
@@ -312,9 +325,7 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
                 onPressed: () {
                   // Could implement manual pin on map
                 },
-                style: IconButton.styleFrom(
-                  shape: const CircleBorder(),
-                ),
+                style: IconButton.styleFrom(shape: const CircleBorder()),
               ),
             ),
           ],
@@ -415,9 +426,7 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
                 onPressed: () {
                   // Could implement manual pin on map
                 },
-                style: IconButton.styleFrom(
-                  shape: const CircleBorder(),
-                ),
+                style: IconButton.styleFrom(shape: const CircleBorder()),
               ),
             ),
           ],
@@ -458,7 +467,6 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
         },
       ),
     );
-
   }
 
   Widget _buildDropoffResults() {
@@ -481,18 +489,18 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.primaryBlue.withOpacity(0.2)),
       ),
-        child: ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _dropoffSuggestions.length,
-          separatorBuilder: (context, index) =>
-              Divider(height: 1, color: AppColors.backgroundLight),
-          itemBuilder: (context, index) {
-            final place = _dropoffSuggestions[index];
-            return _buildPlaceItem(place, () => _selectDropoff(place));
-          },
-        ),
-      );
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _dropoffSuggestions.length,
+        separatorBuilder: (context, index) =>
+            Divider(height: 1, color: AppColors.backgroundLight),
+        itemBuilder: (context, index) {
+          final place = _dropoffSuggestions[index];
+          return _buildPlaceItem(place, () => _selectDropoff(place));
+        },
+      ),
+    );
   }
 
   Widget _buildPlaceItem(PlaceResult place, VoidCallback onTap) {
