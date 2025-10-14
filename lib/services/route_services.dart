@@ -67,7 +67,7 @@ class RideResponse {
 }
 
 class RoutingApiService {
-  static const String baseUrl = 'http://31.220.82.177:9091/api/v1/routing';
+  static const String baseUrl = 'http://31.220.82.177:9097/api/v1/routing';
   final Dio _dio;
 
   RoutingApiService({Dio? dio})

@@ -1,0 +1,334 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../core/theme.dart';
+
+class RouteMap extends StatefulWidget {
+  final LatLng start;
+  final LatLng end;
+  final List<LatLng> routePoints;
+  final String? startAddress;
+  final String? endAddress;
+  final double? height;
+  final bool showControls;
+  final VoidCallback? onRecenter;
+
+  const RouteMap({
+    super.key,
+    required this.start,
+    required this.end,
+    required this.routePoints,
+    this.startAddress,
+    this.endAddress,
+    this.height,
+    this.showControls = true,
+    this.onRecenter,
+  });
+
+  @override
+  State<RouteMap> createState() => _RouteMapState();
+}
+
+class _RouteMapState extends State<RouteMap> {
+  final MapController _mapController = MapController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fitMapToRoute();
+    });
+  }
+
+  void _fitMapToRoute() {
+    if (widget.routePoints.isEmpty) return;
+
+    double minLat = widget.routePoints[0].latitude;
+    double maxLat = widget.routePoints[0].latitude;
+    double minLng = widget.routePoints[0].longitude;
+    double maxLng = widget.routePoints[0].longitude;
+
+    for (var point in widget.routePoints) {
+      if (point.latitude < minLat) minLat = point.latitude;
+      if (point.latitude > maxLat) maxLat = point.latitude;
+      if (point.longitude < minLng) minLng = point.longitude;
+      if (point.longitude > maxLng) maxLng = point.longitude;
+    }
+
+    final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
+
+    _mapController.fitCamera(
+      CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget mapContent = Stack(
+      children: [
+        // Map
+        FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+            initialCenter: widget.start,
+            initialZoom: 13.0,
+            minZoom: 3.0,
+            maxZoom: 20.0,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.ride_driver',
+            ),
+            // Route polyline
+            if (widget.routePoints.isNotEmpty)
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: widget.routePoints,
+                    color: AppColors.primaryBlue,
+                    strokeWidth: 4.0,
+                    borderColor: Colors.white,
+                    borderStrokeWidth: 1.5,
+                  ),
+                ],
+              ),
+            // Markers for start and end points
+            MarkerLayer(
+              markers: [
+                // Start marker (Pickup)
+                Marker(
+                  point: widget.start,
+                  width: 50,
+                  height: 50,
+                  child: _buildPickupMarker(),
+                ),
+                // End marker (Dropoff)
+                Marker(
+                  point: widget.end,
+                  width: 50,
+                  height: 50,
+                  child: _buildDropoffMarker(),
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        // Map controls
+        if (widget.showControls) ...[
+          // Recenter button
+          Positioned(
+            right: 12,
+            bottom: 12,
+            child: GestureDetector(
+              onTap: () {
+                _fitMapToRoute();
+                widget.onRecenter?.call();
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.center_focus_strong,
+                  color: AppColors.primaryBlue,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+
+          // Route info overlay
+          if (widget.startAddress != null && widget.endAddress != null)
+            Positioned(
+              top: 12,
+              left: 12,
+              right: 12,
+              child: _buildRouteInfoOverlay(),
+            ),
+        ],
+      ],
+    );
+
+    // Return with or without container based on height
+    if (widget.height != null) {
+      return Container(
+        height: widget.height,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: mapContent,
+        ),
+      );
+    } else {
+      // Full screen map
+      return mapContent;
+    }
+  }
+
+  Widget _buildPickupMarker() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 35,
+          height: 35,
+          decoration: BoxDecoration(
+            color: Colors.green.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+        ),
+        Container(
+          width: 25,
+          height: 25,
+          decoration: BoxDecoration(
+            color: Colors.green,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 6,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.radio_button_checked,
+            color: Colors.white,
+            size: 14,
+          ),
+        ),
+      ],
+    ).animate().fadeIn(duration: 600.ms).then().scale();
+  }
+
+  Widget _buildDropoffMarker() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 35,
+          height: 35,
+          decoration: BoxDecoration(
+            color: Colors.red.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+        ),
+        Container(
+          width: 25,
+          height: 25,
+          decoration: BoxDecoration(
+            color: Colors.red,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 6,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: const Icon(Icons.location_on, color: Colors.white, size: 14),
+        ),
+      ],
+    ).animate().fadeIn(duration: 600.ms).then().scale();
+  }
+
+  Widget _buildRouteInfoOverlay() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.95),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  widget.startAddress!,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 4, top: 4, bottom: 4),
+            width: 1,
+            height: 16,
+            color: AppColors.textSecondary.withOpacity(0.3),
+          ),
+          Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  widget.endAddress!,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ).animate().slideY(begin: -0.5, end: 0, duration: 400.ms);
+  }
+}

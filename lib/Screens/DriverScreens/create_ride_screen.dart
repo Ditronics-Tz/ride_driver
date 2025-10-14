@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme.dart';
 import '../../services/route_services.dart';
+import '../../wigdets/route_map.dart';
 
 class CreateRideScreen extends ConsumerStatefulWidget {
   final LatLng start;
@@ -132,8 +133,24 @@ class _CreateRideScreenState extends ConsumerState<CreateRideScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Map
-          _buildMap(),
+          // RouteMap Widget - shows the actual route (full screen)
+          if (_rideData != null && !_isLoading)
+            RouteMap(
+              start: widget.start,
+              end: widget.end,
+              routePoints: _routePoints,
+              startAddress: widget.startAddress,
+              endAddress: widget.endAddress,
+              height: null, // Full screen height
+              showControls: false, // Disable controls to show map clearly
+              onRecenter: () {
+                // Optional: Add haptic feedback or analytics
+                debugPrint('Map recentered from CreateRideScreen');
+              },
+            ),
+
+          // Fallback map for loading/error states
+          if (_isLoading || _error != null) _buildFallbackMap(),
 
           // Top Bar
           Positioned(top: 0, left: 0, right: 0, child: _buildTopBar()),
@@ -144,20 +161,21 @@ class _CreateRideScreenState extends ConsumerState<CreateRideScreen> {
           // Error Overlay
           if (_error != null && !_isLoading) _buildErrorOverlay(),
 
-          // Route Details Card
+          // Enhanced Route Details Card
           if (_rideData != null && !_isLoading)
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: _buildRouteDetailsCard(),
+              child: _buildEnhancedRouteDetailsCard(),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildMap() {
+  // Fallback map for loading/error states
+  Widget _buildFallbackMap() {
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
@@ -168,25 +186,10 @@ class _CreateRideScreenState extends ConsumerState<CreateRideScreen> {
       ),
       children: [
         TileLayer(
-          urlTemplate:
-              'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
-          subdomains: const ['a', 'b', 'c', 'd'],
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.example.ride_driver',
         ),
-        // Route polyline
-        if (_routePoints.isNotEmpty)
-          PolylineLayer(
-            polylines: [
-              Polyline(
-                points: _routePoints,
-                color: AppColors.primaryBlue,
-                strokeWidth: 5.0,
-                borderColor: Colors.white,
-                borderStrokeWidth: 2.0,
-              ),
-            ],
-          ),
-        // Markers for start and end points
+        // Basic markers for start and end points during loading
         MarkerLayer(
           markers: [
             // Start marker
@@ -422,7 +425,8 @@ class _CreateRideScreenState extends ConsumerState<CreateRideScreen> {
     );
   }
 
-  Widget _buildRouteDetailsCard() {
+  // Enhanced route details card with better styling and user experience
+  Widget _buildEnhancedRouteDetailsCard() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -453,7 +457,7 @@ class _CreateRideScreenState extends ConsumerState<CreateRideScreen> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
             // Distance and Duration Row
             Padding(
@@ -503,9 +507,9 @@ class _CreateRideScreenState extends ConsumerState<CreateRideScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
-            // Action Buttons
+            // Action Buttons with better styling
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
@@ -561,7 +565,7 @@ class _CreateRideScreenState extends ConsumerState<CreateRideScreen> {
           ],
         ),
       ),
-    ).animate().slideY(begin: 1, end: 0, duration: 400.ms);
+    ).animate().slideY(begin: 1, end: 0, duration: 500.ms);
   }
 
   Widget _buildInfoCard({

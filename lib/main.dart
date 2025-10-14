@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      // Temporarily bypass auth: start at home
+      // Start directly at home (auth disabled)
       initialRoute: AppRoutes.home,
       routes: AppRoutes.routes,
       onGenerateRoute: AppRoutes.generateRoute,
