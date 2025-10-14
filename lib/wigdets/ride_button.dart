@@ -15,7 +15,7 @@ class RideButton extends StatelessWidget {
         height: 60,
         decoration: BoxDecoration(
           color: AppColors.primaryBlue,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
               color: AppColors.primaryBlue.withOpacity(0.3),

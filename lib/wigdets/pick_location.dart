@@ -284,7 +284,7 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryBlue,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -312,6 +312,9 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
                 onPressed: () {
                   // Could implement manual pin on map
                 },
+                style: IconButton.styleFrom(
+                  shape: const CircleBorder(),
+                ),
               ),
             ),
           ],
@@ -384,7 +387,7 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryBlue,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -412,6 +415,9 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
                 onPressed: () {
                   // Could implement manual pin on map
                 },
+                style: IconButton.styleFrom(
+                  shape: const CircleBorder(),
+                ),
               ),
             ),
           ],
@@ -452,6 +458,7 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
         },
       ),
     );
+
   }
 
   Widget _buildDropoffResults() {
@@ -474,18 +481,18 @@ class _PickLocationDialogState extends State<PickLocationDialog> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.primaryBlue.withOpacity(0.2)),
       ),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _dropoffSuggestions.length,
-        separatorBuilder: (context, index) =>
-            Divider(height: 1, color: AppColors.backgroundLight),
-        itemBuilder: (context, index) {
-          final place = _dropoffSuggestions[index];
-          return _buildPlaceItem(place, () => _selectDropoff(place));
-        },
-      ),
-    );
+        child: ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _dropoffSuggestions.length,
+          separatorBuilder: (context, index) =>
+              Divider(height: 1, color: AppColors.backgroundLight),
+          itemBuilder: (context, index) {
+            final place = _dropoffSuggestions[index];
+            return _buildPlaceItem(place, () => _selectDropoff(place));
+          },
+        ),
+      );
   }
 
   Widget _buildPlaceItem(PlaceResult place, VoidCallback onTap) {

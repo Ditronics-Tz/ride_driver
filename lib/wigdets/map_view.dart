@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/map_provider.dart';
+import '../core/theme.dart';
 
 class MapView extends ConsumerStatefulWidget {
   const MapView({super.key});
@@ -51,9 +52,7 @@ class _MapViewState extends ConsumerState<MapView>
               ),
               children: [
                 TileLayer(
-                  urlTemplate:
-                      'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
-                  subdomains: const ['a', 'b', 'c', 'd'],
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.example.ride_driver',
                 ),
                 MarkerLayer(
@@ -67,9 +66,8 @@ class _MapViewState extends ConsumerState<MapView>
         Positioned(
           right: 16,
           bottom: 16,
-          child: FloatingActionButton(
-            heroTag: 'recenterMap', // Add unique hero tag
-            onPressed: () {
+          child: GestureDetector(
+            onTap: () {
               final location = ref.read(currentLocationProvider).value;
               if (location != null) {
                 _mapController.move(
@@ -78,8 +76,26 @@ class _MapViewState extends ConsumerState<MapView>
                 ); // Increased zoom level for recenter
               }
             },
-            backgroundColor: Theme.of(context).primaryColor,
-            child: const Icon(Icons.my_location, color: Colors.white),
+            child: Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: AppColors.primaryBlue,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryBlue.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.my_location,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
           ),
         ),
       ],
@@ -267,6 +283,6 @@ class _AnimatedMarker extends StatelessWidget {
           ),
         ],
       ),
-    ).animate().fadeIn().then().scale();
+    );
   }
 }

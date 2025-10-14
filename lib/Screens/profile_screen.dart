@@ -34,7 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.backgroundWhite,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -99,8 +99,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-            const SizedBox(height: 8),
-
             // Menu Items
             _buildMenuItem(
               icon: Icons.person_outline,
@@ -141,8 +139,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // Handle delete account
               },
             ),
-
-            const SizedBox(height: 20),
 
             // Vehicle Details Section
             Container(
@@ -228,7 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required VoidCallback onTap,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       decoration: BoxDecoration(
         color: AppColors.backgroundWhite,
         borderRadius: BorderRadius.circular(0),
