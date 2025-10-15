@@ -153,40 +153,6 @@ class _RouteMapState extends State<RouteMap> {
                   ),
                 ],
               ),
-              // Debug: Show individual route points as small markers
-              MarkerLayer(
-                markers: widget.routePoints
-                    .asMap()
-                    .entries
-                    .where(
-                      (entry) => entry.key % 3 == 0,
-                    ) // Show every 3rd point
-                    .map(
-                      (entry) => Marker(
-                        point: entry.value,
-                        width: 12,
-                        height: 12,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${entry.key}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
             ] else ...[
               // Show a direct line if no route points available (for debugging)
               PolylineLayer(
@@ -265,39 +231,6 @@ class _RouteMapState extends State<RouteMap> {
               right: 12,
               child: _buildRouteInfoOverlay(),
             ),
-
-          // Debug info overlay
-          Positioned(
-            bottom: 60,
-            left: 12,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Route Points: ${widget.routePoints.length}',
-                    style: const TextStyle(color: Colors.white, fontSize: 11),
-                  ),
-                  if (widget.routePoints.isNotEmpty) ...[
-                    Text(
-                      'First: ${widget.routePoints.first.latitude.toStringAsFixed(6)}, ${widget.routePoints.first.longitude.toStringAsFixed(6)}',
-                      style: const TextStyle(color: Colors.white, fontSize: 9),
-                    ),
-                    Text(
-                      'Last: ${widget.routePoints.last.latitude.toStringAsFixed(6)}, ${widget.routePoints.last.longitude.toStringAsFixed(6)}',
-                      style: const TextStyle(color: Colors.white, fontSize: 9),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
         ],
       ],
     );

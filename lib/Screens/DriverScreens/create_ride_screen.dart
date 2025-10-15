@@ -472,43 +472,6 @@ class _CreateRideScreenState extends ConsumerState<CreateRideScreen> {
                       .fadeIn(duration: 300.ms)
                       .scale(begin: const Offset(0.8, 0.8)),
             ),
-
-          // Debug info overlay (remove in production)
-          if (_rideData != null && !_isLoading)
-            Positioned(
-              top: 100,
-              left: 16,
-              child: GestureDetector(
-                onTap: () {
-                  debugPrint('🔄 Force refreshing route...');
-                  _createRide();
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Route Points: ${_routePoints.length}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const Text(
-                        'Tap to refresh',
-                        style: TextStyle(color: Colors.orange, fontSize: 10),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
