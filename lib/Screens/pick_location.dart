@@ -5,6 +5,7 @@ import '../core/theme.dart';
 import '../services/route_services.dart';
 import '../routes/route.dart';
 import '../wigdets/bottom_nav.dart';
+import 'map_picker_screen.dart';
 
 class PickLocationScreen extends StatefulWidget {
   const PickLocationScreen({super.key});
@@ -146,6 +147,53 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
         'end_address': _selectedDropoff!.label,
       },
     );
+  }
+
+  Future<void> _pickLocationOnMap({required bool isPickup}) async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapPickerScreen(
+          title: isPickup ? 'Pick Pickup Location' : 'Pick Dropoff Location',
+          initialPosition: isPickup
+              ? (_selectedPickup != null
+                    ? LatLng(_selectedPickup!.lat, _selectedPickup!.lng)
+                    : null)
+              : (_selectedDropoff != null
+                    ? LatLng(_selectedDropoff!.lat, _selectedDropoff!.lng)
+                    : null),
+        ),
+      ),
+    );
+
+    if (result != null) {
+      final LatLng latLng = result['latLng'];
+      final String address = result['address'];
+
+      // Create a PlaceResult from the map selection
+      final placeResult = PlaceResult(
+        label: address,
+        lat: latLng.latitude,
+        lng: latLng.longitude,
+        confidence: 1.0, // High confidence for manually selected location
+      );
+
+      if (isPickup) {
+        setState(() {
+          _selectedPickup = placeResult;
+          _pickupController.text = address;
+          _showPickupResults = false;
+          _pickupSuggestions = [];
+        });
+      } else {
+        setState(() {
+          _selectedDropoff = placeResult;
+          _dropoffController.text = address;
+          _showDropoffResults = false;
+          _dropoffSuggestions = [];
+        });
+      }
+    }
   }
 
   int _currentIndex = 0;
@@ -290,28 +338,31 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
           if (_pickupController.text.isEmpty) ...[
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryBlue,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.map, color: Colors.white, size: 18),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Map',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+              child: GestureDetector(
+                onTap: () => _pickLocationOnMap(isPickup: true),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBlue,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.map, color: Colors.white, size: 18),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Map',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -322,9 +373,7 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                   Icons.location_pin,
                   color: AppColors.primaryBlue,
                 ),
-                onPressed: () {
-                  // Could implement manual pin on map
-                },
+                onPressed: () => _pickLocationOnMap(isPickup: true),
                 style: IconButton.styleFrom(shape: const CircleBorder()),
               ),
             ),
@@ -391,28 +440,31 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
           if (_dropoffController.text.isEmpty) ...[
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryBlue,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.map, color: Colors.white, size: 18),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Map',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+              child: GestureDetector(
+                onTap: () => _pickLocationOnMap(isPickup: false),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBlue,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.map, color: Colors.white, size: 18),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Map',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -423,9 +475,7 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                   Icons.location_pin,
                   color: AppColors.primaryBlue,
                 ),
-                onPressed: () {
-                  // Could implement manual pin on map
-                },
+                onPressed: () => _pickLocationOnMap(isPickup: false),
                 style: IconButton.styleFrom(shape: const CircleBorder()),
               ),
             ),
